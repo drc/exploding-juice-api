@@ -5,4 +5,3 @@ import { registerFortune } from "./fortune.js";
 export function registerRoutes(app: OpenAPIHono): void {
 	registerFortune(app);
 }
-
