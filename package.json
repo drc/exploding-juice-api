@@ -1,5 +1,6 @@
 {
   "name": "fortune_cookie",
+  "description": "API Endpoints for ExplodingJuice",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
