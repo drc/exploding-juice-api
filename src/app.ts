@@ -46,6 +46,7 @@ app.get(
 			targetKey: "js",
 			clientKey: "fetch",
 		},
+		defaultOpenAllTags: true,
 	}),
 );
 
