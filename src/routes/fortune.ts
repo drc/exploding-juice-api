@@ -35,7 +35,7 @@ const fortuneRoute = createRoute({
 		201: {
 			content: {
 				"application/json": {
-					schema: z.object({}),
+					schema: z.null(),
 				},
 			},
 			description: `Returns a ${StatusCodes.CREATED} status code if the fortune was printed successfully.`,
@@ -48,6 +48,6 @@ export function registerFortune(app: OpenAPIHono<AppBindings>): void {
 		const { fortune } = c.req.valid("json");
 		console.log("Printing fortune:", fortune);
 		client.write(encoder.line(fortune).newline(5).cut().encode());
-		return c.json({}, StatusCodes.CREATED);
+		return c.json(null, StatusCodes.CREATED);
 	});
 }

@@ -10,10 +10,7 @@ const toDoSchema = z.object({
 		.min(1)
 		.max(200)
 		.openapi({
-			examples: [
-				"Order Corn",
-				"Buy Milk",
-			],
+			examples: ["Order Corn", "Buy Milk"],
 		}),
 });
 
@@ -35,7 +32,7 @@ const toDoRoute = createRoute({
 		201: {
 			content: {
 				"application/json": {
-					schema: z.object({}),
+					schema: z.null(),
 				},
 			},
 			description: `Returns a ${StatusCodes.CREATED} status code if the to-do item was printed successfully.`,
@@ -48,6 +45,6 @@ export function registerToDo(app: OpenAPIHono<AppBindings>): void {
 		const { todo } = c.req.valid("json");
 		console.log("Printing to-do item:", todo);
 		client.write(encoder.line(todo).newline(5).cut().encode());
-		return c.json({}, StatusCodes.CREATED);
+		return c.json(null, StatusCodes.CREATED);
 	});
 }
