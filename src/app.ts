@@ -16,7 +16,7 @@ const app = new OpenAPIHono<AppBindings>();
 app.use(
 	pinoLogger({
 		pino: pino(
-			{ level: env.LOG_LEVEL || "info" },
+			{ level: env.LOG_LEVEL },
 			env.NODE_ENV === "production" ? undefined : pretty(),
 		),
 		http: {
@@ -61,11 +61,10 @@ app.notFound((c) =>
 
 app.onError((err, c) => {
 	console.error("Error occurred:", err);
-	const node_env = env.NODE_ENV || "development";
 	return c.json(
 		{
 			message: err.message || "Internal Server Error",
-			stack: node_env === "development" ? err.stack : undefined,
+			stack: env.NODE_ENV === "development" ? err.stack : undefined,
 		},
 		StatusCodes.INTERNAL_SERVER_ERROR,
 	);
