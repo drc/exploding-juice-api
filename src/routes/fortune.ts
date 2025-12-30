@@ -1,13 +1,19 @@
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
-import { client, encoder } from "../lib/printer.js";
+import { client, encoder } from "@/lib/printer";
+import type { AppBindings } from "@/types";
 
 const fortuneSchema = z.object({
 	fortune: z
 		.string()
 		.min(1)
 		.max(200)
-		.openapi({ example: "What will my future hold?" }),
+		.openapi({
+			examples: [
+				"You will find great success.",
+				"Happiness is around the corner.",
+			],
+		}),
 });
 
 const fortuneRoute = createRoute({
@@ -30,7 +36,7 @@ const fortuneRoute = createRoute({
 	},
 });
 
-export function registerFortune(app: OpenAPIHono): void {
+export function registerFortune(app: OpenAPIHono<AppBindings>): void {
 	app.openapi(fortuneRoute, (c) => {
 		const { fortune } = c.req.valid("json");
 		console.log("Printing fortune:", fortune);
