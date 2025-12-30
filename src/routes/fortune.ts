@@ -1,7 +1,8 @@
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { StatusCodes } from "http-status-codes";
 import { client, encoder } from "@/lib/printer";
-import type { AppBindings } from "@/types";
+import type { AppBindings } from "@/lib/types";
 
 const fortuneSchema = z.object({
 	fortune: z
@@ -17,6 +18,8 @@ const fortuneSchema = z.object({
 });
 
 const fortuneRoute = createRoute({
+	tags: ["Fortune"],
+	summary: "Print a fortune to the connected printer",
 	method: "post",
 	path: "/fortune",
 	request: {
@@ -30,8 +33,12 @@ const fortuneRoute = createRoute({
 	},
 	responses: {
 		201: {
-			description:
-				"Returns a 201 status code if the fortune was printed successfully.",
+			content: {
+				"application/json": {
+					schema: z.object({}),
+				},
+			},
+			description: `Returns a ${StatusCodes.CREATED} status code if the fortune was printed successfully.`,
 		},
 	},
 });
@@ -41,6 +48,6 @@ export function registerFortune(app: OpenAPIHono<AppBindings>): void {
 		const { fortune } = c.req.valid("json");
 		console.log("Printing fortune:", fortune);
 		client.write(encoder.line(fortune).newline(5).cut().encode());
-		return c.json({}, 201);
+		return c.json({}, StatusCodes.CREATED);
 	});
 }

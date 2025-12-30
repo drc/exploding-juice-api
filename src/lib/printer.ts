@@ -1,11 +1,12 @@
 import net from "node:net";
 import ReceiptPrinterEncoder from "@point-of-sale/receipt-printer-encoder";
+import env from "@/env";
 
 const PORT: number = 9100;
-const HOST: string = process.env.PRINTER_HOST ?? "10.0.1.128";
+const HOST: string = env.PRINTER_HOST ?? "10.0.1.128";
 
 function log(...args: unknown[]): void {
-	if (!process.env.NODE_ENV) return;
+	if (env.NODE_ENV === "production") return;
 	console.log("[🧾 THERMAL]", ...args);
 }
 
