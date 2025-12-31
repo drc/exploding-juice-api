@@ -2,6 +2,7 @@ import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { StatusCodes } from "http-status-codes";
 import { client, encoder } from "@/lib/printer";
+import takeScreenshot from "@/lib/takeScreenshot";
 import type { AppBindings } from "@/lib/types";
 
 const toDoSchema = z.object({
@@ -41,10 +42,18 @@ const toDoRoute = createRoute({
 });
 
 export function registerToDo(app: OpenAPIHono<AppBindings>): void {
-	app.openapi(toDoRoute, (c) => {
+	app.openapi(toDoRoute, async (c) => {
 		const { todo } = c.req.valid("json");
 		console.log("Printing to-do item:", todo);
-		client.write(encoder.line(todo).newline(5).cut().encode());
+		const screenshot = await takeScreenshot(
+			`https://printer.explosivejuice.com/todo?item=${encodeURIComponent(todo)}`,
+			"main",
+		);
+		encoder
+			.align("center")
+			.image(screenshot.image, screenshot.width, screenshot.height, "atkinson")
+			.newline(2);
+		client.write(encoder.cut().encode());
 		return c.json(null, StatusCodes.CREATED);
 	});
 }

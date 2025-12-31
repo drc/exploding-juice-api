@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { createMarkdownFromOpenApi } from "@scalar/openapi-to-markdown";
 import { pinoLogger } from "hono-pino";
 import { StatusCodes } from "http-status-codes";
 import pino from "pino";
@@ -16,7 +17,7 @@ const app = new OpenAPIHono<AppBindings>();
 app.use(
 	pinoLogger({
 		pino: pino(
-			{ level: env.LOG_LEVEL || "info" },
+			{ level: env.LOG_LEVEL },
 			env.NODE_ENV === "production" ? undefined : pretty(),
 		),
 		http: {
@@ -46,6 +47,7 @@ app.get(
 			targetKey: "js",
 			clientKey: "fetch",
 		},
+		defaultOpenAllTags: true,
 	}),
 );
 
@@ -54,17 +56,22 @@ app.get("/error", (c) => {
 	throw new Error("This is a test error");
 });
 
+app.get("/llms.txt", async (c) => {
+	const r = await app.request("/doc");
+	const markdown = await createMarkdownFromOpenApi(await r.json());
+	return c.text(markdown);
+});
+
 app.notFound((c) =>
 	c.json({ message: `Not Found: ${c.req.path}` }, StatusCodes.NOT_FOUND),
 );
 
 app.onError((err, c) => {
 	console.error("Error occurred:", err);
-	const node_env = env.NODE_ENV || "development";
 	return c.json(
 		{
 			message: err.message || "Internal Server Error",
-			stack: node_env === "development" ? err.stack : undefined,
+			stack: env.NODE_ENV === "development" ? err.stack : undefined,
 		},
 		StatusCodes.INTERNAL_SERVER_ERROR,
 	);
