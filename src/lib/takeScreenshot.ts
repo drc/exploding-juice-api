@@ -3,10 +3,14 @@ import { chromium } from "playwright";
 import sharp from "sharp";
 import type { Screenshot } from "./types";
 
-async function takeScreenshot(url: string, element: string): Promise<Screenshot> {
+async function takeScreenshot(
+	url: string,
+	element: string,
+): Promise<Screenshot> {
 	const browser = await chromium.launch();
 	try {
-		const page = await browser.newPage();
+		const context = await browser.newContext();
+		const page = await context.newPage();
 		await page.goto(url);
 		const ss = await page.locator(element).screenshot();
 
