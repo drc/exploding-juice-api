@@ -1,4 +1,4 @@
-# Fortune Cookie Printer
+# f0r†un3_c0ok1€
 
 A tiny HTTP API that prints short fortunes to a network thermal receipt printer.
 
@@ -13,29 +13,33 @@ Quick start
 
 1. Install dependencies:
 
-   pnpm install
+   `pnpm install`
 
 2. Start the dev server (LOG_LEVEL is required):
 
-   LOG_LEVEL=info pnpm run dev
+   `LOG_LEVEL=info pnpm run dev`
 
 3. Open the API docs:
 
-   http://localhost:3000
+   <http://localhost:3000>
 
 Usage
 
 Post a JSON body with a single "fortune" string (1–200 characters):
 
+```shell
 curl -X POST http://localhost:3000/fortune \
   -H "Content-Type: application/json" \
   -d '{"fortune":"You will find joy today."}'
+```
 
 Post a JSON body with a single "todo" string (1–200 characters):
 
+```shell
 curl -X POST http://localhost:3000/todo \
   -H "Content-Type: application/json" \
   -d '{"todo":"Buy milk."}'
+```
 
 Configuration
 
@@ -50,10 +54,10 @@ Configuration
 
 Development & running
 
-- Set LOG_LEVEL (required): LOG_LEVEL=info pnpm run dev
-- Dev server: pnpm run dev (uses tsx watch src/index.ts)
-- Build: pnpm run build (runs tsc)
-- Start (production): pnpm start
+- Set LOG_LEVEL (required): `LOG_LEVEL=info pnpm run dev`
+- Dev server: `pnpm run dev` (uses tsx watch src/index.ts)
+- Build: `pnpm run build` (runs tsc)
+- Start (production): `pnpm start`
 
 API Endpoints
 
