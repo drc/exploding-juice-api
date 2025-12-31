@@ -8,7 +8,7 @@
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
 		"start": "tsx dist/index.js",
-		"install:playwright": "test -d /root/.cache/ms-playwright/chromium-* || pnpm exec playwright install --with-deps chromium"
+		"install:playwright": "test -d node_modules/.pnpm/playwright-core@*/node_modules/playwright-core/.local-browsers/chromium-* || pnpm exec playwright install --with-deps chromium"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.19.6",
