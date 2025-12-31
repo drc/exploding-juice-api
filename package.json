@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"description": "API Endpoints for ExplodingJuice",
 	"type": "module",
+	"packageManager": "pnpm@10.26.2",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
