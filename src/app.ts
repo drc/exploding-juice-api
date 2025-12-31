@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { createMarkdownFromOpenApi } from "@scalar/openapi-to-markdown";
 import { pinoLogger } from "hono-pino";
 import { StatusCodes } from "http-status-codes";
 import pino from "pino";
@@ -53,6 +54,12 @@ app.get(
 app.get("/error", (c) => {
 	c.var.logger.error("hello world error");
 	throw new Error("This is a test error");
+});
+
+app.get("/llms.txt", async (c) => {
+	const r = await app.request("/doc");
+	const markdown = await createMarkdownFromOpenApi(await r.json());
+	return c.text(markdown);
 });
 
 app.notFound((c) =>
