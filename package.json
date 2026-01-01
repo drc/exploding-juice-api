@@ -7,8 +7,7 @@
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
-		"start": "tsx dist/index.js",
-		"postinstall": "pnpm exec playwright install --with-deps chromium"
+		"start": "tsx dist/index.js"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.19.7",
