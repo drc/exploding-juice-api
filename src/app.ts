@@ -14,6 +14,8 @@ const TITLE = "f0r†un3_c0ok1€";
 
 const app = new OpenAPIHono<AppBindings>();
 
+app.get("/health", (c) => c.text("OK"));
+
 app.use(
 	pinoLogger({
 		pino: pino(
