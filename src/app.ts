@@ -1,6 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { createMarkdownFromOpenApi } from "@scalar/openapi-to-markdown";
+import { requestId } from "hono/request-id";
 import { pinoLogger } from "hono-pino";
 import { StatusCodes } from "http-status-codes";
 import pino from "pino";
@@ -16,15 +17,17 @@ const app = new OpenAPIHono<AppBindings>();
 
 app.get("/health", (c) => c.text("OK"));
 
+app.use(requestId());
+
 app.use(
 	pinoLogger({
 		pino: pino(
 			{ level: env.LOG_LEVEL },
 			env.NODE_ENV === "production" ? undefined : pretty(),
 		),
-		http: {
-			reqId: () => crypto.randomUUID(),
-		},
+		// http: {
+		// 	reqId: () => crypto.randomUUID(),
+		// },
 	}),
 );
 
