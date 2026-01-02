@@ -10,16 +10,11 @@ const fortuneSchema = z.object({
 		.min(1)
 		.max(200)
 		.openapi({
-			examples: [
-				"You will find great success.",
-				"Happiness is around the corner.",
-			],
+			examples: ["You will find great success.", "Happiness is around the corner."],
 		}),
 });
 
 const fortuneRoute = createRoute({
-	tags: ["Fortune"],
-	summary: "Print a fortune to the connected printer",
 	method: "post",
 	path: "/fortune",
 	request: {
@@ -41,6 +36,8 @@ const fortuneRoute = createRoute({
 			description: `Returns a ${StatusCodes.CREATED} status code if the fortune was printed successfully.`,
 		},
 	},
+	summary: "Print a fortune to the connected printer",
+	tags: ["Fortune"],
 });
 
 export function registerFortune(app: OpenAPIHono<AppBindings>): void {

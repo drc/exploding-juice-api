@@ -16,8 +16,6 @@ const toDoSchema = z.object({
 });
 
 const toDoRoute = createRoute({
-	tags: ["ToDo"],
-	summary: "Print a to-do item to the connected printer",
 	method: "post",
 	path: "/todo",
 	request: {
@@ -39,6 +37,8 @@ const toDoRoute = createRoute({
 			description: `Returns a ${StatusCodes.CREATED} status code if the to-do item was printed successfully.`,
 		},
 	},
+	summary: "Print a to-do item to the connected printer",
+	tags: ["ToDo"],
 });
 
 export function registerToDo(app: OpenAPIHono<AppBindings>): void {
@@ -49,10 +49,7 @@ export function registerToDo(app: OpenAPIHono<AppBindings>): void {
 			`https://printer.explosivejuice.com/todo?item=${encodeURIComponent(todo)}`,
 			"main",
 		);
-		encoder
-			.align("center")
-			.image(screenshot.image, screenshot.width, screenshot.height, "atkinson")
-			.newline(2);
+		encoder.align("center").image(screenshot.image, screenshot.width, screenshot.height, "atkinson").newline(2);
 		client.write(encoder.cut().encode());
 		return c.json(null, StatusCodes.CREATED);
 	});

@@ -20,8 +20,7 @@ const printerClientSingleton = (): net.Socket => {
 };
 
 // Initialize printer client as a singleton to maintain a persistent connection
-export const client: net.Socket =
-	globalThis.printerClientGlobal ?? printerClientSingleton();
+export const client: net.Socket = globalThis.printerClientGlobal ?? printerClientSingleton();
 globalThis.printerClientGlobal = client;
 
 // Establish initial connection to printer on first module load
@@ -57,6 +56,6 @@ declare const globalThis: {
 
 // Initialize the receipt printer encoder with configuration for thermal print formatting
 export const encoder: ReceiptPrinterEncoder = new ReceiptPrinterEncoder({
-	feedBeforeCut: 5,
 	columns: 48,
+	feedBeforeCut: 5,
 });

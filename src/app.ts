@@ -21,10 +21,7 @@ app.use(requestId());
 
 app.use(
 	pinoLogger({
-		pino: pino(
-			{ level: env.LOG_LEVEL },
-			env.NODE_ENV === "production" ? undefined : pretty(),
-		),
+		pino: pino({ level: env.LOG_LEVEL }, env.NODE_ENV === "production" ? undefined : pretty()),
 		// http: {
 		// 	reqId: () => crypto.randomUUID(),
 		// },
@@ -34,25 +31,25 @@ app.use(
 registerRoutes(app);
 
 app.doc("/doc", {
-	openapi: "3.1.0",
 	info: {
 		title: TITLE,
 		version: packageJson.version,
 	},
+	openapi: "3.1.0",
 });
 
 app.get(
 	"/",
 	Scalar({
+		defaultHttpClient: {
+			clientKey: "fetch",
+			targetKey: "js",
+		},
+		defaultOpenAllTags: true,
+		layout: "classic",
 		pageTitle: TITLE,
 		theme: "laserwave",
 		url: "/doc",
-		layout: "classic",
-		defaultHttpClient: {
-			targetKey: "js",
-			clientKey: "fetch",
-		},
-		defaultOpenAllTags: true,
 	}),
 );
 
@@ -67,9 +64,7 @@ app.get("/llms.txt", async (c) => {
 	return c.text(markdown);
 });
 
-app.notFound((c) =>
-	c.json({ message: `Not Found: ${c.req.path}` }, StatusCodes.NOT_FOUND),
-);
+app.notFound((c) => c.json({ message: `Not Found: ${c.req.path}` }, StatusCodes.NOT_FOUND));
 
 app.onError((err, c) => {
 	console.error("Error occurred:", err);

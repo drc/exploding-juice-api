@@ -13,4 +13,4 @@ export interface Screenshot {
 	image: ImageData;
 	width: number;
 	height: number;
-};
+}
