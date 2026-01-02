@@ -1,8 +1,7 @@
-import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { StatusCodes } from "http-status-codes";
-import { client, encoder } from "@/lib/printer";
-import type { AppBindings } from "@/lib/types";
+
+const tags = ["Fortune"];
 
 const fortuneSchema = z.object({
 	fortune: z
@@ -14,9 +13,9 @@ const fortuneSchema = z.object({
 		}),
 });
 
-const fortuneRoute = createRoute({
+export const printAFortune = createRoute({
 	method: "post",
-	path: "/fortune",
+	path: "/ask/print",
 	request: {
 		body: {
 			content: {
@@ -37,14 +36,7 @@ const fortuneRoute = createRoute({
 		},
 	},
 	summary: "Print a fortune to the connected printer",
-	tags: ["Fortune"],
+	tags: tags,
 });
 
-export function registerFortune(app: OpenAPIHono<AppBindings>): void {
-	app.openapi(fortuneRoute, (c) => {
-		const { fortune } = c.req.valid("json");
-		console.log("Printing fortune:", fortune);
-		client.write(encoder.line(fortune).newline(5).cut().encode());
-		return c.json(null, StatusCodes.CREATED);
-	});
-}
+export type PrintAFortuneRoute = typeof printAFortune;
