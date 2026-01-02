@@ -3,10 +3,7 @@ import { chromium } from "playwright";
 import sharp from "sharp";
 import type { Screenshot } from "./types";
 
-async function takeScreenshot(
-	url: string,
-	element: string,
-): Promise<Screenshot> {
+async function takeScreenshot(url: string, element: string): Promise<Screenshot> {
 	const browser = await chromium.launch();
 	try {
 		const context = await browser.newContext();
@@ -23,15 +20,11 @@ async function takeScreenshot(
 		const height = Math.floor(info.height / 8) * 8;
 
 		// Create ImageData from the raw buffer (Uint8ClampedArray required)
-		const imageData = new ImageData(
-			new Uint8ClampedArray(data),
-			info.width,
-			info.height,
-		);
+		const imageData = new ImageData(new Uint8ClampedArray(data), info.width, info.height);
 		return {
+			height: height,
 			image: imageData,
 			width: info.width,
-			height: height,
 		} as Screenshot;
 	} finally {
 		await browser.close();

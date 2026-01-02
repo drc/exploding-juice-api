@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const envSchema = z.object({
+	LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]),
 	NODE_ENV: z.enum(["development", "production"]).default("development"),
 	PORT: z.coerce.number().default(3000),
-	LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]),
 	PRINTER_HOST: z.string().default("10.0.1.128"),
 });
 
