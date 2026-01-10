@@ -2,11 +2,12 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { StatusCodes } from "http-status-codes";
 
 const toDoSchema = z.object({
-	todo: z
+	title: z
 		.string()
 		.min(1)
 		.max(200)
 		.openapi({
+			description: "The title of the to-do item",
 			examples: ["Order Corn", "Buy Milk"],
 		}),
 });

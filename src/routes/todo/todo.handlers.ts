@@ -5,10 +5,10 @@ import type { AppRouteHander } from "@/lib/types";
 import type { PrintTodo } from "./todo.routes";
 
 export const printTodo: AppRouteHander<PrintTodo> = async (c) => {
-	const { todo } = c.req.valid("json");
-	console.log("Printing to-do item:", todo);
+	const { title } = c.req.valid("json");
+	console.log("Printing to-do item:", title);
 	const screenshot = await takeScreenshot(
-		`https://printer.explosivejuice.com/todo?item=${encodeURIComponent(todo)}`,
+		`https://printer.explosivejuice.com/todo?item=${encodeURIComponent(title)}`,
 		"main",
 	);
 	encoder.align("center").image(screenshot.image, screenshot.width, screenshot.height, "atkinson").newline(2);
