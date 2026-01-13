@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^1.19.7
-        version: 1.19.7(hono@4.11.3)
+        version: 1.19.7(hono@4.11.4)
       '@hono/zod-openapi':
         specifier: ^1.2.0
-        version: 1.2.0(hono@4.11.3)(zod@4.3.4)
+        version: 1.2.0(hono@4.11.4)(zod@4.3.4)
       '@napi-rs/canvas':
         specifier: ^0.1.88
         version: 0.1.88
@@ -22,16 +22,16 @@ importers:
         version: https://codeload.github.com/cervantes-x/ReceiptPrinterEncoder/tar.gz/577487da93b2837654b955a99442ec9262df6841
       '@scalar/hono-api-reference':
         specifier: ^0.9.30
-        version: 0.9.30(hono@4.11.3)
+        version: 0.9.30(hono@4.11.4)
       '@scalar/openapi-to-markdown':
         specifier: ^0.3.12
         version: 0.3.12(typescript@5.9.3)
       hono:
-        specifier: ^4.11.3
-        version: 4.11.3
+        specifier: ^4.11.4
+        version: 4.11.4
       hono-pino:
         specifier: ^0.10.3
-        version: 0.10.3(hono@4.11.3)(pino@10.1.0)
+        version: 0.10.3(hono@4.11.4)(pino@10.1.0)
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
@@ -1061,8 +1061,8 @@ packages:
       hono: '>=4.0.0'
       pino: '>=7.1.0'
 
-  hono@4.11.3:
-    resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
+  hono@4.11.4:
+    resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
   html-minifier-terser@7.2.0:
@@ -1742,21 +1742,21 @@ snapshots:
       '@tanstack/vue-virtual': 3.13.14(vue@3.5.26(typescript@5.9.3))
       vue: 3.5.26(typescript@5.9.3)
 
-  '@hono/node-server@1.19.7(hono@4.11.3)':
+  '@hono/node-server@1.19.7(hono@4.11.4)':
     dependencies:
-      hono: 4.11.3
+      hono: 4.11.4
 
-  '@hono/zod-openapi@1.2.0(hono@4.11.3)(zod@4.3.4)':
+  '@hono/zod-openapi@1.2.0(hono@4.11.4)(zod@4.3.4)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 8.2.0(zod@4.3.4)
-      '@hono/zod-validator': 0.7.6(hono@4.11.3)(zod@4.3.4)
-      hono: 4.11.3
+      '@hono/zod-validator': 0.7.6(hono@4.11.4)(zod@4.3.4)
+      hono: 4.11.4
       openapi3-ts: 4.5.0
       zod: 4.3.4
 
-  '@hono/zod-validator@0.7.6(hono@4.11.3)(zod@4.3.4)':
+  '@hono/zod-validator@0.7.6(hono@4.11.4)(zod@4.3.4)':
     dependencies:
-      hono: 4.11.3
+      hono: 4.11.4
       zod: 4.3.4
 
   '@img/colour@1.0.0': {}
@@ -2018,10 +2018,10 @@ snapshots:
 
   '@scalar/helpers@0.2.4': {}
 
-  '@scalar/hono-api-reference@0.9.30(hono@4.11.3)':
+  '@scalar/hono-api-reference@0.9.30(hono@4.11.4)':
     dependencies:
       '@scalar/core': 0.3.28
-      hono: 4.11.3
+      hono: 4.11.4
 
   '@scalar/icons@0.5.2(typescript@5.9.3)':
     dependencies:
@@ -2603,13 +2603,13 @@ snapshots:
 
   highlightjs-curl@1.3.0: {}
 
-  hono-pino@0.10.3(hono@4.11.3)(pino@10.1.0):
+  hono-pino@0.10.3(hono@4.11.4)(pino@10.1.0):
     dependencies:
       defu: 6.1.4
-      hono: 4.11.3
+      hono: 4.11.4
       pino: 10.1.0
 
-  hono@4.11.3: {}
+  hono@4.11.4: {}
 
   html-minifier-terser@7.2.0:
     dependencies:
