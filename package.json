@@ -20,7 +20,7 @@
 		"@point-of-sale/receipt-printer-encoder": "github:cervantes-x/ReceiptPrinterEncoder",
 		"@scalar/hono-api-reference": "^0.9.30",
 		"@scalar/openapi-to-markdown": "^0.3.12",
-		"hono": "^4.11.3",
+		"hono": "^4.11.7",
 		"hono-pino": "^0.10.3",
 		"http-status-codes": "^2.3.0",
 		"pino": "^10.1.0",
