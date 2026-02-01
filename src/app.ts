@@ -1,4 +1,5 @@
 import askRoutes from "@/routes/ask/ask.index";
+import doughboysRoutes from "@/routes/doughboys/dboys.index";
 import errorRoutes from "@/routes/error/error.index";
 import todoRoutes from "@/routes/todo/todo.index";
 import createApp, { configureOpenAPI } from "./lib/factory";
@@ -7,7 +8,7 @@ const app = createApp();
 
 configureOpenAPI(app);
 
-const routes = [askRoutes, todoRoutes, errorRoutes] as const;
+const routes = [askRoutes, todoRoutes, errorRoutes, doughboysRoutes] as const;
 
 routes.forEach((route) => {
 	app.route("/", route);
