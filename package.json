@@ -21,7 +21,7 @@
 		"@scalar/hono-api-reference": "^0.9.30",
 		"@scalar/openapi-to-markdown": "^0.3.12",
 		"@sentry/node": "^10.47.0",
-		"hono": "^4.11.3",
+		"hono": "^4.12.12",
 		"hono-pino": "^0.10.3",
 		"http-status-codes": "^2.3.0",
 		"pino": "^10.1.0",
