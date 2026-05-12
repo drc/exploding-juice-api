@@ -9,6 +9,8 @@ import pretty from "pino-pretty";
 import env from "@/env";
 import packageJson from "../../package.json";
 import type { AppBindings } from "./types";
+import '../../instrument.js';
+import * as Sentry from "@sentry/node";
 
 const TITLE = "f0r†un3_c0ok1€";
 
@@ -35,6 +37,7 @@ export default function createApp() {
 
 	app.onError((err, c) => {
 		console.error("Error occurred:", err);
+		Sentry.captureException(err);
 		return c.json(
 			{
 				message: err.message || "Internal Server Error",
