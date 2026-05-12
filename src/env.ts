@@ -5,6 +5,17 @@ export const envSchema = z.object({
 	NODE_ENV: z.enum(["development", "production"]).default("development"),
 	PORT: z.coerce.number().default(3000),
 	PRINTER_HOST: z.string().default("10.0.1.128"),
+	// Dota 2 ClickHouse Integration
+	CLICKHOUSE_URL: z.string().default("https://clickhouse.ponder.guru"),
+	CLICKHOUSE_USER: z.string().default("default"),
+	CLICKHOUSE_PASSWORD: z.string().optional(),
+	CLICKHOUSE_WRITE_URL: z.string().optional(),
+	CLICKHOUSE_WRITE_USER: z.string().optional(),
+	CLICKHOUSE_WRITE_PASSWORD: z.string().optional(),
+	CLICKHOUSE_WRITE_DATABASE: z.string().default("default"),
+	CLICKHOUSE_WRITE_TABLE: z.string().default("wrapped_data"),
+	ENABLE_PERSISTENCE: z.enum(["true", "false"]).default("false"),
+	CACHE_TTL_MINUTES: z.coerce.number().default(1440),
 });
 
 export type Env = z.infer<typeof envSchema>;
