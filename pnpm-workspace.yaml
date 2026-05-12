@@ -1,5 +1,0 @@
-onlyBuiltDependencies:
-  - canvas
-  - esbuild
-  - sharp
-  - vue-demi

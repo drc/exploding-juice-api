@@ -4,16 +4,16 @@ import type { RequestIdVariables } from "hono/request-id";
 import type { PinoLogger } from "hono-pino";
 
 export interface AppBindings {
-	Variables: {
-		logger: PinoLogger;
-		RequestIdVariables: RequestIdVariables;
-	};
+  Variables: {
+    logger: PinoLogger;
+    RequestIdVariables: RequestIdVariables;
+  };
 }
 
 export interface Screenshot {
-	image: ImageData;
-	width: number;
-	height: number;
+  image: ImageData;
+  width: number;
+  height: number;
 }
 
 export type AppRouteHander<R extends RouteConfig> = RouteHandler<R, AppBindings>;
