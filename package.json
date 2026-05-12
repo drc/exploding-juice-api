@@ -3,15 +3,13 @@
 	"version": "1.0.0",
 	"description": "API Endpoints for ExplodingJuice",
 	"type": "module",
-	"packageManager": "pnpm@10.27.0",
+	"packageManager": "pnpm@11.1.1",
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
 		"start": "tsx dist/index.js",
 		"lint": "oxlint",
-		"lint:fix": "oxlint --fix",
-		"biome:check": "biome check",
-		"format:fix": "biome format --write"
+		"lint:fix": "oxlint --fix"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.19.13",
@@ -31,7 +29,6 @@
 		"zod": "^4.3.4"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.3.10",
 		"@types/node": "^20.19.27",
 		"oxlint": "^1.36.0",
 		"tsx": "^4.21.0",

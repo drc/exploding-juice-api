@@ -8,7 +8,7 @@ import {
 	errorResponseSchema,
 } from "./players.schema";
 
-const tags = ["Dota 2", "Players"];
+const tags = ["Dota 2"];
 
 export const searchPlayers = createRoute({
 	method: "get",
@@ -48,7 +48,7 @@ export const searchPlayers = createRoute({
 
 export const getWeeklyWrapped = createRoute({
 	method: "get",
-	path: "/players/wrapped/:accountId",
+	path: "/players/wrapped/{accountId}",
 	request: {
 		params: z.object({
 			accountId: z.string().regex(/^\d+$/).openapi({
