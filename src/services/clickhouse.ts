@@ -6,22 +6,22 @@ import type { ClickHouseRawResponse } from "@/types/dota";
  * Resolve credential value: if it looks like a shell command, execute it; otherwise use as-is
  */
 function resolveCredential(value: string | undefined): string {
-	if (!value) return "";
+  if (!value) return "";
 
-	// Check if value looks like a shell command: $(...)
-	const shellCmdMatch = value.match(/^\$\((.*)\)$/);
-	if (shellCmdMatch) {
-		try {
-			const cmd = shellCmdMatch[1];
-			const result = execSync(cmd, { encoding: "utf-8" }).trim();
-			return result;
-		} catch (error) {
-			console.error(`Failed to execute credential command: ${value}`, error);
-			return "";
-		}
-	}
+  // Check if value looks like a shell command: $(...)
+  const shellCmdMatch = value.match(/^\$\((.*)\)$/);
+  if (shellCmdMatch) {
+    try {
+      const cmd = shellCmdMatch[1];
+      const result = execSync(cmd, { encoding: "utf-8" }).trim();
+      return result;
+    } catch (error) {
+      console.error(`Failed to execute credential command: ${value}`, error);
+      return "";
+    }
+  }
 
-	return value;
+  return value;
 }
 
 // Read credentials
@@ -211,107 +211,107 @@ FORMAT JSON
 `;
 
 export class ClickHouseClient {
-	/**
-	 * Query weekly wrapped stats for a player
-	 */
-	static async getWeeklyWrapped(
-		accountId: number,
-		weekStartDate: string,
-	): Promise<ClickHouseRawResponse> {
-		try {
-			// Build the query by substituting parameters
-			const query = WEEKLY_WRAPPED_QUERY.replace(/{account_id:UInt64}/g, accountId.toString()).replace(
-				/{week_start_date:String}/g,
-				weekStartDate,
-			);
+  /**
+   * Query weekly wrapped stats for a player
+   */
+  static async getWeeklyWrapped(
+    accountId: number,
+    weekStartDate: string,
+  ): Promise<ClickHouseRawResponse> {
+    try {
+      // Build the query by substituting parameters
+      const query = WEEKLY_WRAPPED_QUERY.replace(
+        /{account_id:UInt64}/g,
+        accountId.toString(),
+      ).replace(/{week_start_date:String}/g, weekStartDate);
 
-			// Build auth header
-			const authHeader = `Basic ${Buffer.from(`${CLICKHOUSE_USER}:${CLICKHOUSE_PASSWORD}`).toString("base64")}`;
+      // Build auth header
+      const authHeader = `Basic ${Buffer.from(`${CLICKHOUSE_USER}:${CLICKHOUSE_PASSWORD}`).toString("base64")}`;
 
-			const response = await fetch(CLICKHOUSE_URL, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded",
-					Accept: "application/json",
-					Authorization: authHeader,
-				},
-				body: query,
-			});
+      const response = await fetch(CLICKHOUSE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+          Authorization: authHeader,
+        },
+        body: query,
+      });
 
-			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(`ClickHouse error (${response.status}): ${errorText}`);
-			}
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`ClickHouse error (${response.status}): ${errorText}`);
+      }
 
-			// Parse the JSON response from ClickHouse
-			const jsonResponse = (await response.json()) as {
-				data?: Array<Record<string, any>>;
-			};
+      // Parse the JSON response from ClickHouse
+      const jsonResponse = (await response.json()) as {
+        data?: Array<Record<string, any>>;
+      };
 
-			if (!jsonResponse.data || jsonResponse.data.length === 0) {
-				throw new Error("Empty response from ClickHouse");
-			}
+      if (!jsonResponse.data || jsonResponse.data.length === 0) {
+        throw new Error("Empty response from ClickHouse");
+      }
 
-			const row = jsonResponse.data[0];
+      const row = jsonResponse.data[0];
 
-			// Map ClickHouse JSON response to ClickHouseRawResponse
-			const rawResponse: ClickHouseRawResponse = {
-				account_id: row.account_id,
-				week_start: row.week_start,
-				week_end: row.week_end,
+      // Map ClickHouse JSON response to ClickHouseRawResponse
+      const rawResponse: ClickHouseRawResponse = {
+        account_id: row.account_id,
+        week_start: row.week_start,
+        week_end: row.week_end,
 
-				// Tier 1
-				matches_played: row.matches_played,
-				total_kills: row.total_kills,
-				total_deaths: row.total_deaths,
-				total_assists: row.total_assists,
-				best_kill_game: row.best_kill_game,
-				longest_kill_streak: row.longest_kill_streak,
-				avg_gpm: row.avg_gpm,
-				avg_xpm: row.avg_xpm,
-				avg_last_hits: row.avg_last_hits,
-				kda_ratio: row.kda_ratio,
+        // Tier 1
+        matches_played: row.matches_played,
+        total_kills: row.total_kills,
+        total_deaths: row.total_deaths,
+        total_assists: row.total_assists,
+        best_kill_game: row.best_kill_game,
+        longest_kill_streak: row.longest_kill_streak,
+        avg_gpm: row.avg_gpm,
+        avg_xpm: row.avg_xpm,
+        avg_last_hits: row.avg_last_hits,
+        kda_ratio: row.kda_ratio,
 
-				// Tier 2
-				avg_match_duration_min: row.avg_match_duration_min,
-				avg_final_level: row.avg_final_level,
-				consistency_score: row.consistency_score,
-				role_detected: row.role_detected,
-				total_gold_earned: row.total_gold_earned,
-				gold_per_kill: row.gold_per_kill,
+        // Tier 2
+        avg_match_duration_min: row.avg_match_duration_min,
+        avg_final_level: row.avg_final_level,
+        consistency_score: row.consistency_score,
+        role_detected: row.role_detected,
+        total_gold_earned: row.total_gold_earned,
+        gold_per_kill: row.gold_per_kill,
 
-				// Tier 3: Streaks
-				max_streak: row.max_streak,
-				streaks_over_5: row.streaks_over_5,
-				streaks_over_10: row.streaks_over_10,
-				comeback_count: row.comeback_count,
+        // Tier 3: Streaks
+        max_streak: row.max_streak,
+        streaks_over_5: row.streaks_over_5,
+        streaks_over_10: row.streaks_over_10,
+        comeback_count: row.comeback_count,
 
-				// Tier 3: Items (already JSON arrays from ClickHouse)
-				item_slots: row.item_slots,
-				item_frequencies: row.item_frequencies,
+        // Tier 3: Items (already JSON arrays from ClickHouse)
+        item_slots: row.item_slots,
+        item_frequencies: row.item_frequencies,
 
-				// Peer rankings
-				matches_percentile: row.matches_percentile,
-				kills_percentile: row.kills_percentile,
-				gpm_percentile: row.gpm_percentile,
-			};
+        // Peer rankings
+        matches_percentile: row.matches_percentile,
+        kills_percentile: row.kills_percentile,
+        gpm_percentile: row.gpm_percentile,
+      };
 
-			return rawResponse;
-		} catch (error) {
-			if (error instanceof Error) {
-				console.error("ClickHouse error:", error.message);
-				throw new Error(`ClickHouse query failed: ${error.message}`);
-			}
-			throw error;
-		}
-	}
+      return rawResponse;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("ClickHouse error:", error.message);
+        throw new Error(`ClickHouse query failed: ${error.message}`);
+      }
+      throw error;
+    }
+  }
 
-	/**
-	 * Get all peer stats for a given week (for percentile calculation)
-	 */
-	static async getPeerStats(weekStartDate: string) {
-		try {
-			const query = `
+  /**
+   * Get all peer stats for a given week (for percentile calculation)
+   */
+  static async getPeerStats(weekStartDate: string) {
+    try {
+      const query = `
 SELECT
   account_id,
   COUNT(DISTINCT match_id) as peer_matches,
@@ -324,49 +324,49 @@ ORDER BY account_id
 FORMAT JSONEachRow
 `;
 
-			// Build auth header
-			const authHeader = `Basic ${Buffer.from(`${CLICKHOUSE_USER}:${CLICKHOUSE_PASSWORD}`).toString("base64")}`;
+      // Build auth header
+      const authHeader = `Basic ${Buffer.from(`${CLICKHOUSE_USER}:${CLICKHOUSE_PASSWORD}`).toString("base64")}`;
 
-			const response = await fetch(CLICKHOUSE_URL, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded",
-					Authorization: authHeader,
-				},
-				body: query,
-			});
+      const response = await fetch(CLICKHOUSE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: authHeader,
+        },
+        body: query,
+      });
 
-			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(`ClickHouse error (${response.status}): ${errorText}`);
-			}
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`ClickHouse error (${response.status}): ${errorText}`);
+      }
 
-			// Parse JSONL response
-			const text = await response.text();
-			const lines = text.trim().split("\n");
-			return lines.map((line: string) => JSON.parse(line));
-		} catch (error) {
-			console.error("Failed to fetch peer stats:", error);
-			throw error;
-		}
-	}
+      // Parse JSONL response
+      const text = await response.text();
+      const lines = text.trim().split("\n");
+      return lines.map((line: string) => JSON.parse(line));
+    } catch (error) {
+      console.error("Failed to fetch peer stats:", error);
+      throw error;
+    }
+  }
 
-	/**
-	 * Save weekly wrapped response to ClickHouse for future querying
-	 * Optional: only runs if ENABLE_PERSISTENCE=true and write credentials configured
-	 */
-	static async persistWrappedData(
-		accountId: number,
-		weekStartDate: string,
-		weekEndDate: string,
-		data: ClickHouseRawResponse,
-	): Promise<void> {
-		if (!ENABLE_PERSISTENCE) {
-			return; // Persistence disabled
-		}
+  /**
+   * Save weekly wrapped response to ClickHouse for future querying
+   * Optional: only runs if ENABLE_PERSISTENCE=true and write credentials configured
+   */
+  static async persistWrappedData(
+    accountId: number,
+    weekStartDate: string,
+    weekEndDate: string,
+    data: ClickHouseRawResponse,
+  ): Promise<void> {
+    if (!ENABLE_PERSISTENCE) {
+      return; // Persistence disabled
+    }
 
-		try {
-			const query = `
+    try {
+      const query = `
 INSERT INTO ${CLICKHOUSE_WRITE_DATABASE}.${CLICKHOUSE_WRITE_TABLE} (
   account_id,
   week_start_date,
@@ -431,33 +431,33 @@ VALUES (
 )
 `;
 
-			// Build auth header if credentials provided
-			const headers: Record<string, string> = {
-				"Content-Type": "application/x-www-form-urlencoded",
-			};
+      // Build auth header if credentials provided
+      const headers: Record<string, string> = {
+        "Content-Type": "application/x-www-form-urlencoded",
+      };
 
-			if (CLICKHOUSE_WRITE_USER && CLICKHOUSE_WRITE_PASSWORD) {
-				const auth = Buffer.from(`${CLICKHOUSE_WRITE_USER}:${CLICKHOUSE_WRITE_PASSWORD}`).toString(
-					"base64",
-				);
-				headers["Authorization"] = `Basic ${auth}`;
-			}
+      if (CLICKHOUSE_WRITE_USER && CLICKHOUSE_WRITE_PASSWORD) {
+        const auth = Buffer.from(`${CLICKHOUSE_WRITE_USER}:${CLICKHOUSE_WRITE_PASSWORD}`).toString(
+          "base64",
+        );
+        headers["Authorization"] = `Basic ${auth}`;
+      }
 
-			const response = await fetch(CLICKHOUSE_WRITE_URL, {
-				method: "POST",
-				headers,
-				body: query,
-			});
+      const response = await fetch(CLICKHOUSE_WRITE_URL, {
+        method: "POST",
+        headers,
+        body: query,
+      });
 
-			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(`ClickHouse persistence error (${response.status}): ${errorText}`);
-			}
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`ClickHouse persistence error (${response.status}): ${errorText}`);
+      }
 
-			console.log(`✓ Persisted wrapped data for account ${accountId} week ${data.week_start}`);
-		} catch (error) {
-			console.error(`Failed to persist wrapped data for account ${accountId}:`, error);
-			// Don't throw - persistence failure shouldn't break the API
-		}
-	}
+      console.log(`✓ Persisted wrapped data for account ${accountId} week ${data.week_start}`);
+    } catch (error) {
+      console.error(`Failed to persist wrapped data for account ${accountId}:`, error);
+      // Don't throw - persistence failure shouldn't break the API
+    }
+  }
 }
