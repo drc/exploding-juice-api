@@ -1,9 +1,0 @@
-allowBuilds:
-  esbuild: true
-  sharp: true
-  vue-demi: true
-onlyBuiltDependencies:
-  - canvas
-  - esbuild
-  - sharp
-  - vue-demi
