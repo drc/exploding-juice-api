@@ -36,6 +36,14 @@ export interface PlayerSearchResult {
 
 export class PlayerService {
   /**
+   * Escape special characters in a value for use in a ClickHouse LIKE pattern.
+   * Escapes %, _, and \ which are special in LIKE patterns, and single quotes for SQL safety.
+   */
+  private static escapeLikePattern(value: string): string {
+    return value.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_").replace(/'/g, "''");
+  }
+
+  /**
    * Search for players by username (case-insensitive, partial match)
    */
   static async searchPlayers(query: string, limit: number = 10): Promise<PlayerSearchResult[]> {
@@ -46,17 +54,16 @@ export class PlayerService {
       }
 
       const cleanQuery = query.trim();
-
-      // Build query using simple string interpolation for the pattern
-      // Since concat() with lower() doesn't work reliably in ClickHouse LIKE, we build the literal pattern
       const lowerQuery = cleanQuery.toLowerCase();
+      const escapedQuery = PlayerService.escapeLikePattern(lowerQuery);
+
       const sqlQuery = `
 SELECT 
   id,
   username,
   created_at
 FROM users
-WHERE lower(username) LIKE '%${lowerQuery}%'
+WHERE lower(username) LIKE '%${escapedQuery}%'
 ORDER BY username
 LIMIT ${limit}
 FORMAT JSON
