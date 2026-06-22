@@ -24,6 +24,10 @@ function resolveCredential(value: string | undefined): string {
   return value;
 }
 
+function escapeSqlString(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/'/g, "''");
+}
+
 // Read credentials
 const CLICKHOUSE_URL = env.CLICKHOUSE_URL;
 const CLICKHOUSE_USER = env.CLICKHOUSE_USER;
@@ -220,10 +224,11 @@ export class ClickHouseClient {
   ): Promise<ClickHouseRawResponse> {
     try {
       // Build the query by substituting parameters
+      const safeWeekStart = escapeSqlString(weekStartDate);
       const query = WEEKLY_WRAPPED_QUERY.replace(
         /{account_id:UInt64}/g,
         accountId.toString(),
-      ).replace(/{week_start_date:String}/g, weekStartDate);
+      ).replace(/{week_start_date:String}/g, safeWeekStart);
 
       // Build auth header
       const authHeader = `Basic ${Buffer.from(`${CLICKHOUSE_USER}:${CLICKHOUSE_PASSWORD}`).toString("base64")}`;
@@ -311,6 +316,7 @@ export class ClickHouseClient {
    */
   static async getPeerStats(weekStartDate: string) {
     try {
+      const safeWeekStart = escapeSqlString(weekStartDate);
       const query = `
 SELECT
   account_id,
@@ -318,7 +324,7 @@ SELECT
   ROUND(AVG(IF(event_key = 'player.gpm', event_value, NULL)), 2) as peer_avg_gpm,
   SUM(IF(event_key = 'player.kills', event_value, 0)) as peer_total_kills
 FROM dota_events
-WHERE toStartOfWeek(timestamp) = toStartOfWeek(toDate('${weekStartDate}'))
+WHERE toStartOfWeek(timestamp) = toStartOfWeek(toDate('${safeWeekStart}'))
 GROUP BY account_id
 ORDER BY account_id
 FORMAT JSONEachRow
@@ -366,8 +372,10 @@ FORMAT JSONEachRow
     }
 
     try {
+      const safeDb = escapeSqlString(CLICKHOUSE_WRITE_DATABASE);
+      const safeTable = escapeSqlString(CLICKHOUSE_WRITE_TABLE);
       const query = `
-INSERT INTO ${CLICKHOUSE_WRITE_DATABASE}.${CLICKHOUSE_WRITE_TABLE} (
+INSERT INTO ${safeDb}.${safeTable} (
   account_id,
   week_start_date,
   week_end_date,
@@ -400,8 +408,8 @@ INSERT INTO ${CLICKHOUSE_WRITE_DATABASE}.${CLICKHOUSE_WRITE_TABLE} (
 )
 VALUES (
   ${data.account_id},
-  '${data.week_start}',
-  '${data.week_end}',
+  '${escapeSqlString(data.week_start)}',
+  '${escapeSqlString(data.week_end)}',
   now(),
   ${data.matches_played},
   ${data.total_kills},
@@ -416,14 +424,14 @@ VALUES (
   ${data.avg_match_duration_min},
   ${data.avg_final_level},
   ${data.consistency_score},
-  '${data.role_detected}',
+  '${escapeSqlString(data.role_detected)}',
   ${data.total_gold_earned},
   ${data.gold_per_kill},
   ${data.max_streak},
   ${data.streaks_over_5},
   ${data.streaks_over_10},
   ${data.comeback_count},
-  [${data.item_slots.map((s) => `'${s}'`).join(",")}],
+  [${data.item_slots.map((s) => `'${escapeSqlString(s)}'`).join(",")}],
   [${data.item_frequencies.join(",")}],
   ${data.matches_percentile},
   ${data.kills_percentile},
