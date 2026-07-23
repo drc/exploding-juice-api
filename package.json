@@ -15,7 +15,7 @@
 		"lint:fix": "oxlint --fix"
 	},
 	"dependencies": {
-		"@hono/node-server": "^1.19.14",
+		"@hono/node-server": "^2.0.10",
 		"@hono/zod-openapi": "^1.4.0",
 		"@napi-rs/canvas": "^0.1.88",
 		"@point-of-sale/receipt-printer-encoder": "github:cervantes-x/ReceiptPrinterEncoder",
