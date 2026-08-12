@@ -16,6 +16,7 @@ export const envSchema = z.object({
   CLICKHOUSE_WRITE_TABLE: z.string().default("wrapped_data"),
   ENABLE_PERSISTENCE: z.enum(["true", "false"]).default("false"),
   CACHE_TTL_MINUTES: z.coerce.number().default(1440),
+  CLIP_API_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

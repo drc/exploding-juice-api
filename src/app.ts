@@ -1,4 +1,5 @@
 import askRoutes from "@/routes/ask/ask.index";
+import clipsRoutes from "@/routes/clips/clips.index";
 import errorRoutes from "@/routes/error/error.index";
 import todoRoutes from "@/routes/todo/todo.index";
 import playersRoutes from "@/routes/players/players.index";
@@ -8,7 +9,7 @@ const app = createApp();
 
 configureOpenAPI(app);
 
-const routes = [askRoutes, todoRoutes, errorRoutes, playersRoutes] as const;
+const routes = [askRoutes, todoRoutes, errorRoutes, playersRoutes, clipsRoutes] as const;
 
 routes.forEach((route) => {
   app.route("/", route);
