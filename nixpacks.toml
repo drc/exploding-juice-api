@@ -1,11 +1,8 @@
 [phases.setup]
-aptPkgs = ["ffmpeg"]
+aptPkgs = ["ffmpeg", "curl"]
 
 [phases.build]
-cmds = [
-  "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp",
-  "chmod +x /usr/local/bin/yt-dlp"
-]
+cmds = ["pnpm run build"]
 
 [start]
-cmd = "yt-dlp -U && pnpm start"
+cmd = "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp && pnpm start"
