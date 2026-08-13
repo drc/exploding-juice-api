@@ -35,17 +35,25 @@ export const cutClip: AppRouteHander<CutClipRoute> = async (c) => {
   const body = c.req.valid("json");
   const hostname = new URL(body.url).hostname.replace(/^www\./, "");
   if (!ALLOWED_HOSTNAMES.includes(hostname)) {
-    return c.json({ message: "URL must be a YouTube link" }, StatusCodes.BAD_REQUEST);
+    return c.json(
+      { message: "URL must be a YouTube link" },
+      StatusCodes.BAD_REQUEST,
+    );
   }
 
   if (!acquire()) {
-    return c.json({ message: "Too many concurrent requests" }, StatusCodes.TOO_MANY_REQUESTS);
+    return c.json(
+      { message: "Too many concurrent requests" },
+      StatusCodes.TOO_MANY_REQUESTS,
+    );
   }
 
   const tmpDir = await mkdtemp(join(tmpdir(), "clip-"));
   try {
     const videoId = new URL(body.url).searchParams.get("v") ?? "clip";
-    const clipName = body.name ? sanitizeName(body.name) : `clip_${body.start}-${body.end}`;
+    const clipName = body.name
+      ? sanitizeName(body.name)
+      : `clip_${body.start}-${body.end}`;
 
     const args = [
       "--no-playlist",
@@ -54,6 +62,7 @@ export const cutClip: AppRouteHander<CutClipRoute> = async (c) => {
       "ba/best",
       "--download-sections",
       `*${body.start}-${body.end}`,
+      "--force-keyframes-at-cuts",
       "-x",
       "--audio-format",
       "mp3",
@@ -67,19 +76,27 @@ export const cutClip: AppRouteHander<CutClipRoute> = async (c) => {
     ];
 
     await new Promise<void>((resolve, reject) => {
-      execFile("yt-dlp", args, { timeout: TIMEOUT_MS }, (error, _stdout, stderr) => {
-        if (error) {
-          const tail = stderr?.slice(-STDERR_MAX) ?? "";
-          reject(new Error(tail || error.message));
-        } else {
-          resolve();
-        }
-      });
+      execFile(
+        "yt-dlp",
+        args,
+        { timeout: TIMEOUT_MS },
+        (error, _stdout, stderr) => {
+          if (error) {
+            const tail = stderr?.slice(-STDERR_MAX) ?? "";
+            reject(new Error(tail || error.message));
+          } else {
+            resolve();
+          }
+        },
+      );
     });
 
     const files = await readdir(tmpDir);
     if (files.length === 0) {
-      return c.json({ message: "yt-dlp produced no output" }, StatusCodes.BAD_GATEWAY);
+      return c.json(
+        { message: "yt-dlp produced no output" },
+        StatusCodes.BAD_GATEWAY,
+      );
     }
 
     const filePath = join(tmpDir, files[0]);
