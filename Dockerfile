@@ -5,10 +5,10 @@ RUN apt-get update && \
     pip3 install --break-system-packages yt-dlp && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g corepack@0.24.1 && corepack enable
+RUN corepack enable
 
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm i --frozen-lockfile
 
 COPY . .
