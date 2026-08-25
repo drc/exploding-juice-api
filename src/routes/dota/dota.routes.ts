@@ -2,7 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { StatusCodes } from "http-status-codes";
 import { matchIdSchema } from "./dota.schema";
 
-const tags = ["Dota"];
+const tags = ["Dota 2"];
 
 export const printMatchResult = createRoute({
   method: "post",
