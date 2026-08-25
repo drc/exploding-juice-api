@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  ts-deepmerge: '>=8.0.0'
-
 importers:
 
   .:
@@ -1724,8 +1721,8 @@ packages:
   trough@2.2.0:
     resolution: {integrity: sha512-tmMpK00BjZiUyVyvrBK7knerNgmgvcV/KLVyuma/SC+TQN167GrMRciANTz09+k3zW8L8t60jWO1GpfkZdjTaw==}
 
-  ts-deepmerge@8.0.0:
-    resolution: {integrity: sha512-133O+10nJmVI8w5xeVZPEv5PIrv7iaUae07wv1aH8XJH95Ur6YIhWAPhPyP1YPlbPS9fCVcNIZTu7m8urRVF0A==}
+  ts-deepmerge@7.0.3:
+    resolution: {integrity: sha512-Du/ZW2RfwV/D4cmA5rXafYjBQVuvu4qGiEEla4EmEHVHgRdx68Gftx7i66jn2bzHPwSVZY36Ae6OuDn9el4ZKA==}
     engines: {node: '>=14.13.1'}
 
   tslib@2.8.1:
@@ -2368,7 +2365,7 @@ snapshots:
       '@scalar/helpers': 0.2.18
       flatted: 3.4.4
       just-clone: 6.2.0
-      ts-deepmerge: 8.0.0
+      ts-deepmerge: 7.0.3
 
   '@scalar/openapi-parser@0.24.17':
     dependencies:
@@ -3674,7 +3671,7 @@ snapshots:
 
   trough@2.2.0: {}
 
-  ts-deepmerge@8.0.0: {}
+  ts-deepmerge@7.0.3: {}
 
   tslib@2.8.1: {}
 
