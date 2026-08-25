@@ -58,14 +58,20 @@ export function configureOpenAPI(app: OpenAPIHono<AppBindings>) {
   app.get(
     "/",
     Scalar({
+      darkMode: true,
       defaultHttpClient: {
-        clientKey: "fetch",
-        targetKey: "js",
+        clientKey: "curl",
+        targetKey: "shell",
       },
       defaultOpenAllTags: true,
-      layout: "classic",
+      hiddenClients: {
+        js: ["axios", "fetch", "jquery", "ofetch", "xhr"],
+        node: ["axios", "ofetch", "undici"],
+        python: ["aiohttp", "httpx_async", "httpx_sync", "python3"],
+      },
+      layout: "modern",
       pageTitle: TITLE,
-      theme: "laserwave",
+      theme: "fastify",
       url: "/doc",
     }),
   );
