@@ -6,11 +6,10 @@ import todoRoutes from '@/routes/todo/todo.index';
 
 import createApp, { configureOpenAPI } from './lib/factory';
 
-const app = createApp();
+const app = createApp(),
+  routes = [askRoutes, todoRoutes, errorRoutes, clipsRoutes, dotaRoutes] as const;
 
 configureOpenAPI(app);
-
-const routes = [askRoutes, todoRoutes, errorRoutes, clipsRoutes, dotaRoutes] as const;
 
 routes.forEach((route) => {
   app.route('/', route);

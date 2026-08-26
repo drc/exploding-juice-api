@@ -1,10 +1,8 @@
 import { createRouter } from '@/lib/factory';
 
-import * as handlers from './ask.handlers';
-import * as routes from './ask.routes';
+import { askAndPrint, printAFortune } from './ask.handlers';
+import { askAndPrint as askAndPrintRoute, printAFortune as printAFortuneRoute } from './ask.routes';
 
-const router = createRouter()
-  .openapi(routes.askAndPrint, handlers.askAndPrint)
-  .openapi(routes.printAFortune, handlers.printAFortune);
+const router = createRouter().openapi(askAndPrintRoute, askAndPrint).openapi(printAFortuneRoute, printAFortune);
 
 export default router;

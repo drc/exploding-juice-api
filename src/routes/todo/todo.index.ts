@@ -1,8 +1,8 @@
 import { createRouter } from '@/lib/factory';
 
-import * as handlers from './todo.handlers';
-import * as routes from './todo.routes';
+import printTodo from './todo.handlers';
+import { printTodo as printTodoRoute } from './todo.routes';
 
-const router = createRouter().openapi(routes.printTodo, handlers.printTodo);
+const router = createRouter().openapi(printTodoRoute, printTodo);
 
 export default router;

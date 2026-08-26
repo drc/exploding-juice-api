@@ -11,15 +11,15 @@ export const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-let env: Env;
-
-try {
-  env = envSchema.parse(process.env);
-} catch (e) {
-  const error = e as z.ZodError;
-  console.error('❌ Invalid environment variables:');
-  console.error(z.prettifyError(error));
-  process.exit(1);
-}
+const env: Env = (() => {
+  try {
+    return envSchema.parse(process.env);
+  } catch (error) {
+    const zodError = error as z.ZodError;
+    console.error('❌ Invalid environment variables:');
+    console.error(z.prettifyError(zodError));
+    process.exit(1);
+  }
+})();
 
 export default env;

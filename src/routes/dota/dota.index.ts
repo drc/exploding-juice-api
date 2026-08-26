@@ -1,8 +1,8 @@
 import { createRouter } from '@/lib/factory';
 
-import * as handlers from './dota.handlers';
-import * as routes from './dota.routes';
+import printMatchResult from './dota.handlers';
+import { printMatchResult as printMatchResultRoute } from './dota.routes';
 
-const router = createRouter().openapi(routes.printMatchResult, handlers.printMatchResult);
+const router = createRouter().openapi(printMatchResultRoute, printMatchResult);
 
 export default router;

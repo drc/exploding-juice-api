@@ -20,16 +20,19 @@ export function createRouter() {
 
 export default function createApp() {
   const app = createRouter();
+  const prettyStream = env.NODE_ENV === 'production' ? undefined : pretty();
+  const logger = pino({ level: env.LOG_LEVEL }, prettyStream);
   app.get('/health', (c) => c.text('OK'));
   app.use(requestId()).use(
     pinoLogger({
-      pino: pino({ level: env.LOG_LEVEL }, env.NODE_ENV === 'production' ? undefined : pretty()),
+      pino: logger,
     }),
   );
 
   app.get('/llms.txt', async (c) => {
-    const r = await app.request('/doc');
-    const markdown = await createMarkdownFromOpenApi(await r.json());
+    const response = await app.request('/doc'),
+      document = await response.json(),
+      markdown = await createMarkdownFromOpenApi(document);
     return c.text(markdown);
   });
 

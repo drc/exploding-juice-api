@@ -18,6 +18,8 @@
     ],
     "no-console": "off",
     "@typescript-eslint/consistent-type-imports": "warn",
+    "one-var": "off",
+    "new-cap": ["warn", { "capIsNewExceptions": ["Scalar"] }],
 
     "sort-keys": "off",
     "sort-imports": "off",

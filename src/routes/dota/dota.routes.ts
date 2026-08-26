@@ -31,7 +31,7 @@ export const printMatchResult = createRoute({
   },
   summary:
     'Print a Dota 2 match summary (winner, score, team lineups) to the thermal printer. Fetches match data from OpenDota by match_id.',
-  tags: tags,
+  tags,
 });
 
 export type PrintMatchResultRoute = typeof printMatchResult;

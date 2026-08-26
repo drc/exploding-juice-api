@@ -14,20 +14,18 @@ export const printAFortune: AppRouteHander<PrintAFortuneRoute> = (c) => {
 };
 
 export const askAndPrint: AppRouteHander<AskAndPrintRoute> = async (c) => {
-  const { question } = c.req.valid('json');
-
-  const orb_response = await fetch('https://orb.ponder.guru/', {
-    body: JSON.stringify({ question }),
-    headers: { 'Content-Type': 'application/json' },
-    method: 'POST',
-  });
-  const { wisdom } = await orb_response.json();
-
-  const print_response = await app.request('/ask/print', {
-    body: JSON.stringify({ fortune: wisdom }),
-    headers: { 'Content-Type': 'application/json' },
-    method: 'POST',
-  });
+  const { question } = c.req.valid('json'),
+    orb_response = await fetch('https://orb.ponder.guru/', {
+      body: JSON.stringify({ question }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    }),
+    { wisdom } = await orb_response.json(),
+    print_response = await app.request('/ask/print', {
+      body: JSON.stringify({ fortune: wisdom }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    });
 
   if (!print_response.ok) {
     throw new Error('Failed to print fortune');

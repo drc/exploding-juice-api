@@ -3,8 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import env from '@/env';
 import { createRouter } from '@/lib/factory';
 
-import * as handlers from './clips.handlers';
-import * as routes from './clips.routes';
+import cutClip from './clips.handlers';
+import { cutClip as cutClipRoute } from './clips.routes';
 
 const router = createRouter();
 
@@ -16,6 +16,6 @@ router.use('/clips/*', async (c, next) => {
   await next();
 });
 
-router.openapi(routes.cutClip, handlers.cutClip);
+router.openapi(cutClipRoute, cutClip);
 
 export default router;

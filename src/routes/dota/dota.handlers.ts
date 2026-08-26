@@ -8,21 +8,23 @@ import type { OpenDotaPlayer } from '@/types/opendota';
 import type { PrintMatchResultRoute } from './dota.routes';
 import { formatDuration } from './dota.schema';
 
-type DebugLogger = {
+interface DebugLogger {
   info: (details: Record<string, unknown>, message: string) => void;
-};
+}
 
-const COLUMNS = 48;
-const DIVIDER = '='.repeat(COLUMNS);
-const THIN_DIVIDER = '-'.repeat(COLUMNS);
-const activeMatchPrintJobs = new Set<string>();
+const COLUMNS = 48,
+  DIVIDER = '='.repeat(COLUMNS),
+  THIN_DIVIDER = '-'.repeat(COLUMNS),
+  activeMatchPrintJobs = new Set<string>();
 
 function debugLog(logger: DebugLogger, event: string, details: Record<string, unknown> = {}): void {
   logger.info(details, `[dota-match-debug] ${event}`);
 }
 
 function padRight(s: string, n: number): string {
-  if (s.length >= n) return s.slice(0, n);
+  if (s.length >= n) {
+    return s.slice(0, n);
+  }
   return s + ' '.repeat(n - s.length);
 }
 
@@ -46,33 +48,32 @@ async function mapPlayer(p: OpenDotaPlayer) {
 
 async function processMatchResult(match_id: string, logger: DebugLogger): Promise<void> {
   debugLog(logger, 'job_started', { match_id });
-  let match;
-  try {
-    match = await fetchMatch(match_id, logger);
-  } catch (err) {
-    debugLog(logger, 'job_fetch_failed', {
-      match_id,
-      error: err instanceof Error ? err.message : String(err),
-    });
-    return;
-  }
+  const match = await (async () => {
+    try {
+      return await fetchMatch(match_id, logger);
+    } catch (error) {
+      debugLog(logger, 'job_fetch_failed', {
+        match_id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  })();
   if (match === null) {
     debugLog(logger, 'match_not_ready_after_polling', { match_id });
     debugLog(logger, 'job_completed', { match_id, outcome: 'not_ready' });
     return;
   }
 
-  const date = new Date(match.start_time * 1000).toISOString().slice(0, 10);
-  const duration = formatDuration(match.duration);
-  const winner = match.radiant_win ? 'RADIANT' : 'DIRE';
-  const winnerScore = match.radiant_win ? match.radiant_score : match.dire_score;
-  const loserScore = match.radiant_win ? match.dire_score : match.radiant_score;
-
-  const radiant_players = match.players.filter((p) => isRadiant(p.player_slot));
-  const dire_players = match.players.filter((p) => !isRadiant(p.player_slot));
-
-  const radiant_team = await Promise.all(radiant_players.map(mapPlayer));
-  const dire_team = await Promise.all(dire_players.map(mapPlayer));
+  const date = new Date(match.start_time * 1000).toISOString().slice(0, 10),
+    duration = formatDuration(match.duration),
+    winner = match.radiant_win ? 'RADIANT' : 'DIRE',
+    winnerScore = match.radiant_win ? match.radiant_score : match.dire_score,
+    loserScore = match.radiant_win ? match.dire_score : match.radiant_score,
+    radiant_players = match.players.filter((p) => isRadiant(p.player_slot)),
+    dire_players = match.players.filter((p) => !isRadiant(p.player_slot)),
+    radiant_team = await Promise.all(radiant_players.map(mapPlayer)),
+    dire_team = await Promise.all(dire_players.map(mapPlayer));
 
   let e = encoder
     .line(DIVIDER)
@@ -119,10 +120,10 @@ async function processMatchResult(match_id: string, logger: DebugLogger): Promis
   try {
     print(e, logger);
     debugLog(logger, 'job_completed', { match_id });
-  } catch (err) {
+  } catch (error) {
     debugLog(logger, 'job_print_failed', {
       match_id,
-      error: err instanceof Error ? err.message : String(err),
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 }
@@ -136,10 +137,10 @@ function enqueueMatchPrint(match_id: string, logger: DebugLogger): void {
   debugLog(logger, 'job_queued', { match_id });
 
   void processMatchResult(match_id, logger)
-    .catch((err) => {
+    .catch((error) => {
       debugLog(logger, 'job_failed', {
         match_id,
-        error: err instanceof Error ? err.message : String(err),
+        error: error instanceof Error ? error.message : String(error),
       });
     })
     .finally(() => {
@@ -148,10 +149,12 @@ function enqueueMatchPrint(match_id: string, logger: DebugLogger): void {
     });
 }
 
-export const printMatchResult: AppRouteHander<PrintMatchResultRoute> = (c) => {
+const printMatchResult: AppRouteHander<PrintMatchResultRoute> = (c) => {
   const { match_id } = c.req.valid('json');
   debugLog(c.var.logger, 'request_accepted', { match_id });
   enqueueMatchPrint(match_id, c.var.logger);
 
   return c.json({ status: 'accepted', match_id }, StatusCodes.ACCEPTED);
 };
+
+export default printMatchResult;

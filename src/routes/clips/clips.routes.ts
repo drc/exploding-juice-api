@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import { StatusCodes } from 'http-status-codes';
 
-import { clipRequestSchema } from './clips.schema';
+import clipRequestSchema from './clips.schema';
 
 const tags = ['Clips'];
 

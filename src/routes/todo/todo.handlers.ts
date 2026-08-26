@@ -6,7 +6,7 @@ import type { AppRouteHander } from '@/lib/types';
 
 import type { PrintTodo } from './todo.routes';
 
-export const printTodo: AppRouteHander<PrintTodo> = async (c) => {
+const printTodo: AppRouteHander<PrintTodo> = async (c) => {
   const { title } = c.req.valid('json');
   console.log('Printing to-do item:', title);
   const screenshot = await takeScreenshot(
@@ -17,3 +17,5 @@ export const printTodo: AppRouteHander<PrintTodo> = async (c) => {
   print(encoder.cut());
   return c.json(null, StatusCodes.CREATED);
 };
+
+export default printTodo;

@@ -6,16 +6,18 @@ import pino from 'pino';
 import env from '@/env';
 
 // Default port for thermal printer communication (ESC/POS protocol)
-const PORT: number = 9100;
-// IP address of the thermal printer, with fallback to default
-const HOST: string = env.PRINTER_HOST ?? '10.0.1.128';
+const PORT = 9100,
+  // IP address of the thermal printer, with fallback to default
+  HOST: string = env.PRINTER_HOST ?? '10.0.1.128';
 
 // When true, skip the network entirely and render a readable preview of the
 // ESC/POS payload to the terminal instead.
 export const offline: boolean = env.PRINTER_OFFLINE === 'true';
 
 const printerLogger = pino({ level: env.LOG_LEVEL });
-type DebugLogger = { info: (details: Record<string, unknown>, message: string) => void };
+interface DebugLogger {
+  info: (details: Record<string, unknown>, message: string) => void;
+}
 
 function debugLog(logger: DebugLogger, event: string, details: Record<string, unknown> = {}): void {
   logger.info(details, `[dota-match-debug] ${event}`);
@@ -25,7 +27,9 @@ debugLog(printerLogger, 'printer_mode', { offline });
 
 // Development logging utility - only logs when not in production
 function log(...args: unknown[]): void {
-  if (env.NODE_ENV === 'production') return;
+  if (env.NODE_ENV === 'production') {
+    return;
+  }
   console.log('[🧾 THERMAL]', ...args);
 }
 
@@ -72,8 +76,7 @@ client.on('close', (): void => {
 
 // Extend global type definitions for printer-specific properties
 declare global {
-  var printerClientGlobal: ReturnType<typeof printerClientSingleton> | undefined;
-  var printerConnected: boolean | undefined;
+  var printerClientGlobal: ReturnType<typeof printerClientSingleton> | undefined, printerConnected: boolean | undefined;
 }
 
 // Initialize the receipt printer encoder with configuration for thermal print formatting
@@ -125,9 +128,13 @@ function renderPreview(buf: Uint8Array): void {
     if (b === 0x1b) {
       // ESC ...
       const cmd = buf[i + 1];
-      if (cmd === undefined) break;
+      if (cmd === undefined) {
+        break;
+      }
       i += 2;
-      if (ESC_ONE_PARAM.has(cmd)) i += 1;
+      if (ESC_ONE_PARAM.has(cmd)) {
+        i += 1;
+      }
       continue;
     }
 
@@ -136,19 +143,23 @@ function renderPreview(buf: Uint8Array): void {
       const cmd = buf[i + 1];
       if (cmd === 0x76 && buf[i + 2] === 0x30) {
         // GS v 0 m wL wH hL hH ...  — raster image
-        const m = buf[i + 3] ?? 0;
-        const w = ((buf[i + 5] ?? 0) << 8) | (buf[i + 4] ?? 0);
-        const h = ((buf[i + 7] ?? 0) << 8) | (buf[i + 6] ?? 0);
-        const bytesPerRow = Math.ceil((m === 0 ? w : w * (m === 32 ? 4 : 8)) / 8);
-        const dataLen = bytesPerRow * h;
+        const m = buf[i + 3] ?? 0,
+          w = ((buf[i + 5] ?? 0) << 8) | (buf[i + 4] ?? 0),
+          h = ((buf[i + 7] ?? 0) << 8) | (buf[i + 6] ?? 0),
+          bytesPerRow = Math.ceil((m === 0 ? w : w * (m === 32 ? 4 : 8)) / 8),
+          dataLen = bytesPerRow * h;
         cleaned.push(0x0a);
-        for (const ch of `[image ${w}x${h}]`) cleaned.push(ch.charCodeAt(0));
+        for (const ch of `[image ${w}x${h}]`) {
+          cleaned.push(ch.charCodeAt(0));
+        }
         cleaned.push(0x0a);
         i += 8 + dataLen;
         continue;
       }
       i += 2;
-      if (cmd === 0x21 || cmd === 0x42 || cmd === 0x56) i += 1;
+      if (cmd === 0x21 || cmd === 0x42 || cmd === 0x56) {
+        i += 1;
+      }
       continue;
     }
 
@@ -171,5 +182,5 @@ function renderPreview(buf: Uint8Array): void {
   }
 
   const text = new TextDecoder('utf-8').decode(new Uint8Array(cleaned));
-  console.log('[🧾 THERMAL DRY-RUN]\n' + text);
+  console.log(`[🧾 THERMAL DRY-RUN]\n${text}`);
 }

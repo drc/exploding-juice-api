@@ -11,7 +11,7 @@ export const getAnError = createRoute({
     },
   },
   summary: 'Simulate an error for testing purposes',
-  tags: tags,
+  tags,
 });
 
 export type GetAnError = typeof getAnError;

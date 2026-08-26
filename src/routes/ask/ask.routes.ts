@@ -28,7 +28,7 @@ export const printAFortune = createRoute({
     },
   },
   summary: 'Print a fortune to the connected printer',
-  tags: tags,
+  tags,
 });
 
 export const askAndPrint = createRoute({
@@ -54,7 +54,7 @@ export const askAndPrint = createRoute({
     },
   },
   summary: 'Ask for a fortune and print it to the connected printer',
-  tags: tags,
+  tags,
 });
 
 export type AskAndPrintRoute = typeof askAndPrint;
