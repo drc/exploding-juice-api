@@ -1,85 +1,103 @@
 # f0r†un3_c0ok1€
 
-A tiny HTTP API that prints short fortunes to a network thermal receipt printer.
+A TypeScript HTTP API for printing fortunes, to-do items, and Dota 2 results to a network thermal printer. It also provides ClickHouse-backed player metrics and audio clip generation.
 
-Features
+## Quick Start
 
-- POST /fortune (application/json) — prints a fortune and returns 201
-- POST /todo (application/json) — prints a to-do item and returns 201
-- API reference landing page at / (Scalar API Reference) with OpenAPI JSON available at /doc
-- Lightweight, TypeScript-based server using Hono and zod
-
-Quick start
-
-1. Install dependencies:
-
-   `pnpm install`
-
-2. Start the dev server (LOG_LEVEL is required):
-
-   `LOG_LEVEL=info pnpm run dev`
-
-3. Open the API docs:
-
-   <http://localhost:3000>
-
-Usage
-
-Post a JSON body with a single "fortune" string (1–200 characters):
+Install dependencies and start the development server:
 
 ```shell
-curl -X POST http://localhost:3000/fortune \
-  -H "Content-Type: application/json" \
-  -d '{"fortune":"You will find joy today."}'
+pnpm install
+LOG_LEVEL=info pnpm dev
 ```
 
-Post a JSON body with a single "todo" string (1–200 characters):
+The API documentation is available at <http://localhost:3000> and the OpenAPI document is at <http://localhost:3000/doc>.
+
+`LOG_LEVEL` is required. For local development without a printer, set `PRINTER_OFFLINE=true`:
 
 ```shell
-curl -X POST http://localhost:3000/todo \
-  -H "Content-Type: application/json" \
-  -d '{"todo":"Buy milk."}'
+LOG_LEVEL=info PRINTER_OFFLINE=true pnpm dev
 ```
 
-Configuration
+## Commands
 
-- Environment variables:
-  - NODE_ENV: "development" | "production" (default: development). Controls pretty logging and whether printer socket logs are emitted (see src/env.ts:3-8 and src/lib/printer.ts:8-11).
-  - PORT: server port (default: 3000) — see src/env.ts:5 and src/index.ts:6-10.
-  - LOG_LEVEL: one of fatal, error, warn, info, debug, trace (required). Used by pino (see src/env.ts:6 and src/app.ts:16-22).
-  - PRINTER_HOST: thermal printer host (default: "10.0.1.128") — see src/env.ts:7 and src/lib/printer.ts:5-6.
-- Printer port: 9100 (constant in src/lib/printer.ts:5).
-- Printer encoding: columns=48, feedBeforeCut=5 (see src/lib/printer.ts:66-69).
-- Print jobs are encoded and sent with encoder.line(...).newline(5).cut().encode() in src/routes/fortune.ts:50 and src/routes/todo.ts:47.
+```shell
+pnpm dev                    # Start tsx watch mode
+pnpm lint                   # Run oxlint
+pnpm lint:fix               # Apply oxlint fixes
+pnpm exec oxfmt --check     # Check formatting
+pnpm build                  # Typecheck and write dist/
+pnpm start                  # Run the built application
+pnpm audit                  # Check dependency vulnerabilities
+```
 
-Development & running
+There is no test suite. CI verifies the project with `pnpm lint` and `pnpm build`.
 
-- Set LOG_LEVEL (required): `LOG_LEVEL=info pnpm run dev`
-- Dev server: `pnpm run dev` (uses tsx watch src/index.ts)
-- Build: `pnpm run build` (runs tsc)
-- Start (production): `pnpm start`
+## API Endpoints
 
-API Endpoints
+### Fortune
 
-- POST /fortune — prints a fortune (body: { "fortune": string }, 1–200 chars) and returns 201 (see src/routes/fortune.ts).
-- POST /todo — prints a to-do item (body: { "todo": string }, 1–200 chars) and returns 201 (see src/routes/todo.ts).
-- GET /doc — OpenAPI JSON (OpenAPI 3.1.0) exported by the app (see src/app.ts:30-36).
-- GET / — API reference landing page (Scalar API Reference, theme "laserwave") linking to /doc (see src/app.ts:38-51).
-- GET /error — test route that throws an error (stack traces shown only in development) (see src/app.ts:53-56).
+`POST /ask` asks the fortune service a question and prints the response:
 
-Testing without a printer
+```shell
+curl -X POST http://localhost:3000/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question":"Will I find success?"}'
+```
 
-- For local testing, set PRINTER_HOST=127.0.0.1 and listen on the printer port:
+`POST /ask/print` prints a supplied fortune:
 
-  PRINTER_HOST=127.0.0.1 nc -l 9100
+```shell
+curl -X POST http://localhost:3000/ask/print \
+  -H "Content-Type: application/json" \
+  -d '{"fortune":"You will find great success."}'
+```
 
-- Then POST to /fortune or /todo to see the raw bytes in the nc listener.
+Both endpoints accept strings from 1 to 200 characters and return `201` on success.
 
-Troubleshooting
+### Printing And Media
 
-- If nothing prints, confirm PRINTER_HOST and port and that there are no network firewalls.
-- Missing or invalid environment variables cause the server to exit with an error (see src/env.ts:14-21).
+- `POST /todo` accepts `{ "title": string }`, screenshots the requested page, and prints it.
+- `POST /dota/match-result` accepts a Dota match ID and starts a background thermal print job; it returns `202`.
+- `POST /clips/cut` creates an MP3 clip from a YouTube video. It requires `yt-dlp` and `ffmpeg` in the runtime environment.
 
-License
+### Dota And Service
 
-- None specified.
+- `GET /players/search?query=&limit=` searches Dota players through ClickHouse.
+- `GET /players/wrapped/{accountId}` returns weekly wrapped metrics from ClickHouse.
+- `GET /health` returns `OK`.
+- `GET /doc` returns the OpenAPI 3.1 document.
+- `GET /llms.txt` returns Markdown generated from the OpenAPI document.
+- `GET /` serves the Scalar API reference.
+
+## Configuration
+
+All environment variables are validated at startup by `src/env.ts`. Invalid values terminate the process. Use `.env.example` as the variable list.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `LOG_LEVEL` | required | Pino log level: `fatal`, `error`, `warn`, `info`, `debug`, or `trace` |
+| `NODE_ENV` | `development` | Selects development or production logging and error details |
+| `PORT` | `3000` | HTTP server port |
+| `PRINTER_HOST` | `10.0.1.128` | Thermal printer hostname or address |
+| `PRINTER_OFFLINE` | `false` | Skip printer networking and render a terminal preview |
+| `CLICKHOUSE_URL` | `https://clickhouse.ponder.guru` | ClickHouse read endpoint |
+| `CLICKHOUSE_USER` | `default` | ClickHouse read user |
+| `CLICKHOUSE_PASSWORD` | unset | ClickHouse read password; may be a shell command |
+| `CLICKHOUSE_WRITE_URL` | unset | Optional ClickHouse write endpoint |
+| `CLICKHOUSE_WRITE_USER` | unset | Optional ClickHouse write user |
+| `CLICKHOUSE_WRITE_PASSWORD` | unset | Optional ClickHouse write password; may be a shell command |
+| `CLICKHOUSE_WRITE_DATABASE` | `default` | ClickHouse write database |
+| `CLICKHOUSE_WRITE_TABLE` | `wrapped_data` | ClickHouse write table |
+| `ENABLE_PERSISTENCE` | `false` | Enable fire-and-forget ClickHouse writes |
+| `CACHE_TTL_MINUTES` | `1440` | In-memory cache lifetime |
+| `CLIP_API_SECRET` | unset | Secret used to authorize clip requests |
+
+The printer uses TCP port `9100` and connects when the printer module loads unless offline mode is enabled. The application uses Playwright for screenshots, `sharp` for image conversion, and `@napi-rs/canvas` for printer image data.
+
+## Development Notes
+
+- The Node entrypoint is `src/index.ts`; route groups are mounted by `src/app.ts`.
+- Each route group under `src/routes/` separates route definitions, handlers, schemas, and wiring.
+- `@/` imports resolve to `src/` through `tsconfig.json`.
+- `dist/` is generated and ignored by git.
