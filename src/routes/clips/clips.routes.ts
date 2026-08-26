@@ -1,16 +1,17 @@
-import { createRoute, z } from "@hono/zod-openapi";
-import { StatusCodes } from "http-status-codes";
-import { clipRequestSchema } from "./clips.schema";
+import { createRoute, z } from '@hono/zod-openapi';
+import { StatusCodes } from 'http-status-codes';
 
-const tags = ["Clips"];
+import clipRequestSchema from './clips.schema';
+
+const tags = ['Clips'];
 
 export const cutClip = createRoute({
-  method: "post",
-  path: "/clips/cut",
+  method: 'post',
+  path: '/clips/cut',
   request: {
     body: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: clipRequestSchema,
         },
       },
@@ -18,27 +19,27 @@ export const cutClip = createRoute({
   },
   responses: {
     200: {
-      description: "MP3 audio clip",
+      description: 'MP3 audio clip',
       content: {
-        "audio/mpeg": {
+        'audio/mpeg': {
           schema: z.any(),
         },
       },
     },
     [StatusCodes.BAD_REQUEST]: {
-      description: "Invalid input (bad URL, clip too long, etc.)",
-      content: { "application/json": { schema: z.object({ message: z.string() }) } },
+      description: 'Invalid input (bad URL, clip too long, etc.)',
+      content: { 'application/json': { schema: z.object({ message: z.string() }) } },
     },
     [StatusCodes.TOO_MANY_REQUESTS]: {
-      description: "Too many concurrent clip requests",
-      content: { "application/json": { schema: z.object({ message: z.string() }) } },
+      description: 'Too many concurrent clip requests',
+      content: { 'application/json': { schema: z.object({ message: z.string() }) } },
     },
     [StatusCodes.BAD_GATEWAY]: {
-      description: "yt-dlp or ffmpeg failed",
-      content: { "application/json": { schema: z.object({ message: z.string() }) } },
+      description: 'yt-dlp or ffmpeg failed',
+      content: { 'application/json': { schema: z.object({ message: z.string() }) } },
     },
   },
-  summary: "Cut an audio clip from a YouTube video",
+  summary: 'Cut an audio clip from a YouTube video',
   tags,
 });
 

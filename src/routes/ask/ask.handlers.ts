@@ -1,34 +1,34 @@
-import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
-import app from "@/app";
-import { encoder, print } from "@/lib/printer";
-import type { AppRouteHander } from "@/lib/types";
-import type { AskAndPrintRoute, PrintAFortuneRoute } from "./ask.routes";
+import { StatusCodes } from 'http-status-codes/build/cjs/status-codes';
+
+import app from '@/app';
+import { encoder, print } from '@/lib/printer';
+import type { AppRouteHander } from '@/lib/types';
+
+import type { AskAndPrintRoute, PrintAFortuneRoute } from './ask.routes';
 
 export const printAFortune: AppRouteHander<PrintAFortuneRoute> = (c) => {
-  const { fortune } = c.req.valid("json");
-  console.log("Printing fortune:", fortune);
+  const { fortune } = c.req.valid('json');
+  console.log('Printing fortune:', fortune);
   print(encoder.line(fortune).newline(5).cut());
   return c.json(null, StatusCodes.CREATED);
 };
 
 export const askAndPrint: AppRouteHander<AskAndPrintRoute> = async (c) => {
-  const { question } = c.req.valid("json");
-
-  const orb_response = await fetch("https://orb.ponder.guru/", {
-    body: JSON.stringify({ question }),
-    headers: { "Content-Type": "application/json" },
-    method: "POST",
-  });
-  const { wisdom } = await orb_response.json();
-
-  const print_response = await app.request("/ask/print", {
-    body: JSON.stringify({ fortune: wisdom }),
-    headers: { "Content-Type": "application/json" },
-    method: "POST",
-  });
+  const { question } = c.req.valid('json'),
+    orb_response = await fetch('https://orb.ponder.guru/', {
+      body: JSON.stringify({ question }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    }),
+    { wisdom } = await orb_response.json(),
+    print_response = await app.request('/ask/print', {
+      body: JSON.stringify({ fortune: wisdom }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    });
 
   if (!print_response.ok) {
-    throw new Error("Failed to print fortune");
+    throw new Error('Failed to print fortune');
   }
 
   return c.json(null, StatusCodes.CREATED);

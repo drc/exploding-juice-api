@@ -4,4 +4,4 @@ allowBuilds:
   sharp: true
   vue-demi: true
 overrides:
-  ts-deepmerge: ">=8.0.0"
+  ts-deepmerge: '>=8.0.0'

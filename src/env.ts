@@ -1,25 +1,25 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const envSchema = z.object({
-  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]),
-  NODE_ENV: z.enum(["development", "production"]).default("development"),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']),
+  NODE_ENV: z.enum(['development', 'production']).default('development'),
   PORT: z.coerce.number().default(3000),
-  PRINTER_HOST: z.string().default("10.0.1.128"),
-  PRINTER_OFFLINE: z.enum(["true", "false"]).default("false"),
+  PRINTER_HOST: z.string().default('10.0.1.128'),
+  PRINTER_OFFLINE: z.enum(['true', 'false']).default('false'),
   CLIP_API_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
 
-let env: Env;
-
-try {
-  env = envSchema.parse(process.env);
-} catch (e) {
-  const error = e as z.ZodError;
-  console.error("❌ Invalid environment variables:");
-  console.error(z.prettifyError(error));
-  process.exit(1);
-}
+const env: Env = (() => {
+  try {
+    return envSchema.parse(process.env);
+  } catch (error) {
+    const zodError = error as z.ZodError;
+    console.error('❌ Invalid environment variables:');
+    console.error(z.prettifyError(zodError));
+    process.exit(1);
+  }
+})();
 
 export default env;
