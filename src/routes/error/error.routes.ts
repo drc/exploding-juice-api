@@ -10,7 +10,8 @@ export const getAnError = createRoute({
       description: 'Internal Server Error',
     },
   },
-  summary: 'Simulate an error for testing purposes',
+  summary: 'Simulate Error',
+  description: 'Simulate an error for testing purposes',
   tags,
 });
 

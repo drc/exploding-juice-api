@@ -29,7 +29,8 @@ export const printMatchResult = createRoute({
       description: 'Match print job accepted and running in the background.',
     },
   },
-  summary:
+  summary: 'Print Match Result',
+  description:
     'Print a Dota 2 match summary (winner, score, team lineups) to the thermal printer. Fetches match data from OpenDota by match_id.',
   tags,
 });

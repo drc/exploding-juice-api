@@ -27,7 +27,8 @@ export const printAFortune = createRoute({
       description: `Returns a ${StatusCodes.CREATED} status code if the fortune was printed successfully.`,
     },
   },
-  summary: 'Print a fortune to the connected printer',
+  summary: 'Print Fortune',
+  description: 'Print a fortune to the connected printer',
   tags,
 });
 
@@ -53,7 +54,8 @@ export const askAndPrint = createRoute({
       description: `Returns a ${StatusCodes.CREATED} status code if the fortune was printed successfully.`,
     },
   },
-  summary: 'Ask for a fortune and print it to the connected printer',
+  summary: 'Ask For Fortune',
+  description: 'Ask for a fortune and print it to the connected printer',
   tags,
 });
 

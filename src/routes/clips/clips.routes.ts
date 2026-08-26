@@ -39,7 +39,8 @@ export const cutClip = createRoute({
       content: { 'application/json': { schema: z.object({ message: z.string() }) } },
     },
   },
-  summary: 'Cut an audio clip from a YouTube video',
+  summary: 'Cut Audio Clip',
+  description: 'Cut an audio clip from a YouTube video',
   tags,
 });
 
