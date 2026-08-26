@@ -1,56 +1,39 @@
 # Fortune Cookie API
 
-Hono TypeScript server (pnpm). Thermal printer + Dota 2 analytics API.
-
 ## Commands
 
-- **dev**: `pnpm dev` — `tsx watch src/index.ts`
-- **build**: `pnpm build` — `tsc` (outputs to `dist/`)
-- **start**: `pnpm start` — `tsx dist/index.js`
-- **lint**: `pnpm lint` — `oxlint`
-- **lint:fix**: `pnpm lint:fix` — `oxlint --fix`
-- **format**: `pnpm oxfmt` (no script; run `oxfmt` directly)
+- `pnpm install` installs dependencies; use `pnpm install --frozen-lockfile` to match CI.
+- `pnpm dev` starts `tsx watch src/index.ts`.
+- `pnpm lint` runs oxlint; `pnpm lint:fix` applies its fixes.
+- `pnpm build` runs `tsc` and writes ignored output to `dist/`.
+- `pnpm start` runs the built `dist/index.js` through `tsx`.
+- There is no test suite or test script; verification is `pnpm lint && pnpm build`.
+- Run `pnpm exec oxfmt --check` to check formatting; run `pnpm exec oxfmt` to format.
 
-No tests, no CI, no test framework.
+## Runtime Setup
 
-## GitHub Actions / Dependabot
+- `LOG_LEVEL` is required. All environment variables are parsed by `src/env.ts`; invalid values terminate startup.
+- Use `.env.example` as the variable list. `.env` and `.env.production` are ignored and must not be committed.
+- Set `PRINTER_OFFLINE=true` for local runs without a thermal printer; otherwise `src/lib/printer.ts` opens a singleton TCP connection to `PRINTER_HOST:9100` during module load.
+- `CLICKHOUSE_PASSWORD` and write credentials may be shell-command strings; `ENABLE_PERSISTENCE=true` enables fire-and-forget ClickHouse writes.
 
-- `.github/dependabot.yml` — weekly npm + GH Actions dep updates, grouped by scope (hono, dev-deps, etc.)
-- `.github/workflows/ci.yml` — lint + build on push/PR to `main`. Uses `pnpm/action-setup@v4`, node version from `package.json` `engines`, pnpm cache.
+## Structure
 
-## Env
+- `src/index.ts` is the Node entrypoint; `src/app.ts` creates the app and mounts route groups at `/`.
+- `src/lib/factory.ts` configures `OpenAPIHono`, logging, request IDs, error handling, `/health`, `/doc`, `/llms.txt`, and Scalar at `/`.
+- Route groups live under `src/routes/<name>/`; `.index.ts` wires handlers, `.routes.ts` defines OpenAPI routes, and `.schema.ts` holds schemas.
+- `@/` imports resolve to `src/` via `tsconfig.json`.
+- Screenshot handling combines Playwright, `sharp`, and `@napi-rs/canvas`; native package install/build permissions are declared in `pnpm-workspace.yaml`.
 
-`LOG_LEVEL` is required. Copy `.env.example` → `.env`. All vars validated via Zod at startup; server exits on invalid env.
+## Endpoints
 
-## Architecture
+- `POST /ask` asks the fortune service and prints the result; `POST /ask/print` prints a supplied fortune.
+- `POST /todo` screenshots a page and prints it.
+- `GET /players/search` and `GET /players/wrapped/:accountId` query ClickHouse-backed Dota data.
+- `GET /health` returns `OK`; `GET /doc` serves OpenAPI JSON; `GET /llms.txt` serves generated Markdown; `/` serves Scalar.
 
-- **Entrypoint**: `src/index.ts` → `serve(@hono/node-server)`
-- **App factory**: `src/lib/factory.ts` — creates `OpenAPIHono`, wires pino logger, request ID, notFound/onError, Scalar docs at `/`, OpenAPI JSON at `/doc`, `/health`, `/llms.txt`
-- **Routes**: each route group is `src/routes/<name>/` with `*.index.ts` (wires routes+handlers), `*.routes.ts` (zod-openapi route defs), `*.handlers.ts`, `*.schema.ts`
-- **Route mounting**: `src/app.ts` mounts all route routers at `/`
-- **Import path alias**: `@/` → `./src/*` (configured in tsconfig)
+## CI And Git
 
-## Routes
-
-| Path | Description |
-|------|-------------|
-| `POST /ask` | Ask orb.ponder.guru for wisdom, print to thermal printer |
-| `POST /ask/print` | Print a fortune string directly |
-| `POST /todo` | Screenshot a web page, print it as image to thermal printer |
-| `GET /players/search?query=&limit=` | Dota 2 player search via ClickHouse |
-| `GET /players/wrapped/:accountId` | Weekly wrapped stats via ClickHouse |
-| `GET /error` | Test error route |
-| `GET /health` | Returns "OK" |
-| `/` | Scalar API reference UI |
-
-## Notable
-
-- **Printer**: global singleton socket (`src/lib/printer.ts:23`). Connects on module load. Port `9100`, host from `PRINTER_HOST` env (default `10.0.1.128`). Uses `@point-of-sale/receipt-printer-encoder`.
-- **ClickHouse**: raw SQL string interpolation (`src/services/clickhouse.ts:228-231`). Credentials can be shell commands: `CLICKHOUSE_PASSWORD=$(some_cmd)`. Persistence is optional (fire-and-forget, gated by `ENABLE_PERSISTENCE=true`).
-- **Cache**: in-memory `Map` with TTL (`CACHE_TTL_MINUTES`, default 1440 min).
-- **Screenshots**: uses Playwright `chromium.launch()`, sharp for conversion, `@napi-rs/canvas` ImageData.
-- **OpenAPI**: auto-generated via `@hono/zod-openapi`, served at `/doc`, rendered at `/` via Scalar (laserwave theme).
-
-## Stale docs
-
-`README.md` references `src/routes/fortune.ts` — the fortune routes live in `src/routes/ask/`. `.vscode/settings.json` references biome — project uses oxlint/oxfmt.
+- `.github/workflows/ci.yml` runs `lint` and `build` on pushes and pull requests targeting `main`; both jobs use the self-hosted `Linux`/`X64` runner and frozen pnpm installs.
+- `main` is protected by required CI checks; dependency or workflow changes should go through a PR rather than a direct push.
+- `.github/dependabot.yml` manages weekly npm and GitHub Actions updates, grouping Hono/Scalar and development dependencies.
