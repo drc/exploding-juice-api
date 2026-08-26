@@ -54,11 +54,10 @@ client.on("close", (): void => {
 });
 
 // Extend global type definitions for printer-specific properties
-// biome-ignore lint/suspicious/noShadowRestrictedNames: ok
-declare const globalThis: {
-  printerClientGlobal: ReturnType<typeof printerClientSingleton>;
-  printerConnected: boolean;
-} & typeof global;
+declare global {
+  var printerClientGlobal: ReturnType<typeof printerClientSingleton> | undefined;
+  var printerConnected: boolean | undefined;
+}
 
 // Initialize the receipt printer encoder with configuration for thermal print formatting
 export const encoder: ReceiptPrinterEncoder = new ReceiptPrinterEncoder({

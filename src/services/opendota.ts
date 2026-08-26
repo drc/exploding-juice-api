@@ -1,8 +1,4 @@
-import type {
-  OpenDotaHero,
-  OpenDotaMatch,
-  OpenDotaPlayer,
-} from "@/types/opendota";
+import type { OpenDotaHero, OpenDotaMatch, OpenDotaPlayer } from "@/types/opendota";
 
 const OPENDOTA_BASE = "https://api.opendota.com/api";
 const RETRY_DELAYS_MS = [2000, 5000, 10000];
@@ -13,10 +9,7 @@ const profileCache = new Map<number, string>();
 let heroesPromise: Promise<void> | null = null;
 
 const PARSE_REQUEST_TTL_MS = 5 * 60_000;
-const parseRequested = new Map<
-  string,
-  { expiresAt: number; promise: Promise<void> }
->();
+const parseRequested = new Map<string, { expiresAt: number; promise: Promise<void> }>();
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,9 +49,7 @@ export async function getHeroName(heroId: number): Promise<string> {
   return heroCache.get(heroId) ?? "Unknown";
 }
 
-export async function fetchPlayerProfile(
-  accountId: number,
-): Promise<string | null> {
+export async function fetchPlayerProfile(accountId: number): Promise<string | null> {
   if (profileCache.has(accountId)) return profileCache.get(accountId)!;
   try {
     const profile = await fetchJson<{ profile?: { personaname?: string | null } }>(
@@ -111,11 +102,7 @@ export async function requestParse(matchId: string): Promise<void> {
 }
 
 function isIncompleteMatch(match: OpenDotaMatch): boolean {
-  return (
-    match.od_data?.has_parsed === false ||
-    match.version == null ||
-    match.players.length === 0
-  );
+  return match.od_data?.has_parsed === false || match.version == null || match.players.length === 0;
 }
 
 export async function fetchMatch(matchId: string): Promise<OpenDotaMatch | null> {
@@ -137,9 +124,7 @@ export async function fetchMatch(matchId: string): Promise<OpenDotaMatch | null>
         await delay(retryDelay);
         let parsedMatch: OpenDotaMatch;
         try {
-          parsedMatch = await fetchJson<OpenDotaMatch>(
-            `${OPENDOTA_BASE}/matches/${matchId}`,
-          );
+          parsedMatch = await fetchJson<OpenDotaMatch>(`${OPENDOTA_BASE}/matches/${matchId}`);
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error);
           if (msg.startsWith("opendota_http_404")) return null;

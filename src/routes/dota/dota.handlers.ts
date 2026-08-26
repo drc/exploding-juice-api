@@ -1,12 +1,7 @@
 import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
 import { encoder, print } from "@/lib/printer";
 import type { AppRouteHander } from "@/lib/types";
-import {
-  fetchMatch,
-  fetchPlayerProfile,
-  getHeroName,
-  isRadiant,
-} from "@/services/opendota";
+import { fetchMatch, fetchPlayerProfile, getHeroName, isRadiant } from "@/services/opendota";
 import type { OpenDotaPlayer } from "@/types/opendota";
 import type { PrintMatchResultRoute } from "./dota.routes";
 import { formatDuration } from "./dota.schema";
@@ -55,9 +50,7 @@ async function processMatchResult(match_id: string): Promise<void> {
   const date = new Date(match.start_time * 1000).toISOString().slice(0, 10);
   const duration = formatDuration(match.duration);
   const winner = match.radiant_win ? "RADIANT" : "DIRE";
-  const winnerScore = match.radiant_win
-    ? match.radiant_score
-    : match.dire_score;
+  const winnerScore = match.radiant_win ? match.radiant_score : match.dire_score;
   const loserScore = match.radiant_win ? match.dire_score : match.radiant_score;
 
   const radiant_players = match.players.filter((p) => isRadiant(p.player_slot));
@@ -101,13 +94,7 @@ async function processMatchResult(match_id: string): Promise<void> {
     );
   }
 
-  e = e
-    .line(THIN_DIVIDER)
-    .align("center")
-    .line("GG WP")
-    .line(DIVIDER)
-    .newline(3)
-    .cut();
+  e = e.line(THIN_DIVIDER).align("center").line("GG WP").line(DIVIDER).newline(3).cut();
 
   try {
     print(e);
