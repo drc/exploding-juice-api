@@ -26,5 +26,6 @@ export interface OpenDotaMatch {
     has_api?: boolean;
     has_gcdata?: boolean;
     has_parsed?: boolean;
+    has_archive?: boolean;
   };
 }
