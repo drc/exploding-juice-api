@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
-import { client, encoder } from "@/lib/printer";
+import { encoder, print } from "@/lib/printer";
 import takeScreenshot from "@/lib/takeScreenshot";
 import type { AppRouteHander } from "@/lib/types";
 import type { PrintTodo } from "./todo.routes";
@@ -15,6 +15,6 @@ export const printTodo: AppRouteHander<PrintTodo> = async (c) => {
     .align("center")
     .image(screenshot.image, screenshot.width, screenshot.height, "atkinson")
     .newline(2);
-  client.write(encoder.cut().encode());
+  print(encoder.cut());
   return c.json(null, StatusCodes.CREATED);
 };
