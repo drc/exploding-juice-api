@@ -15,7 +15,6 @@
 - `LOG_LEVEL` is required. All environment variables are parsed by `src/env.ts`; invalid values terminate startup.
 - Use `.env.example` as the variable list. `.env` and `.env.production` are ignored and must not be committed.
 - Set `PRINTER_OFFLINE=true` for local runs without a thermal printer; otherwise `src/lib/printer.ts` opens a singleton TCP connection to `PRINTER_HOST:9100` during module load.
-- `CLICKHOUSE_PASSWORD` and write credentials may be shell-command strings; `ENABLE_PERSISTENCE=true` enables fire-and-forget ClickHouse writes.
 
 ## Structure
 
@@ -29,7 +28,7 @@
 
 - `POST /ask` asks the fortune service and prints the result; `POST /ask/print` prints a supplied fortune.
 - `POST /todo` screenshots a page and prints it.
-- `GET /players/search` and `GET /players/wrapped/:accountId` query ClickHouse-backed Dota data.
+- `POST /dota/match-result` fetches match and player details from OpenDota, including fallback player profile lookups, and prints the result.
 - `GET /health` returns `OK`; `GET /doc` serves OpenAPI JSON; `GET /llms.txt` serves generated Markdown; `/` serves Scalar.
 
 ## CI And Git
