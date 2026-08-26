@@ -5,6 +5,7 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production"]).default("development"),
   PORT: z.coerce.number().default(3000),
   PRINTER_HOST: z.string().default("10.0.1.128"),
+  PRINTER_OFFLINE: z.enum(["true", "false"]).default("false"),
   // Dota 2 ClickHouse Integration
   CLICKHOUSE_URL: z.string().default("https://clickhouse.ponder.guru"),
   CLICKHOUSE_USER: z.string().default("default"),

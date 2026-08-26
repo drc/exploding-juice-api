@@ -2,31 +2,30 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/dota-match-result]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
-          node-version-file: package.json
-          cache: pnpm
+          node-version: 22.13.0
+      - uses: pnpm/action-setup@v6
       - run: pnpm install
       - run: pnpm lint
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
-          node-version-file: package.json
-          cache: pnpm
+          node-version: 22.13.0
+      - uses: pnpm/action-setup@v6
       - run: pnpm install
       - run: pnpm build
