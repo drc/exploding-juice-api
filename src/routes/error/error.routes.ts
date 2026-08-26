@@ -1,16 +1,16 @@
-import { createRoute } from "@hono/zod-openapi";
+import { createRoute } from '@hono/zod-openapi';
 
-const tags = ["Error"];
+const tags = ['Error'];
 
 export const getAnError = createRoute({
-  method: "get",
-  path: "/error",
+  method: 'get',
+  path: '/error',
   responses: {
     500: {
-      description: "Internal Server Error",
+      description: 'Internal Server Error',
     },
   },
-  summary: "Simulate an error for testing purposes",
+  summary: 'Simulate an error for testing purposes',
   tags: tags,
 });
 

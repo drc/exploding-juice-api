@@ -1,7 +1,8 @@
-import { ImageData } from "@napi-rs/canvas";
-import { chromium } from "playwright";
-import sharp from "sharp";
-import type { Screenshot } from "./types";
+import { ImageData } from '@napi-rs/canvas';
+import { chromium } from 'playwright';
+import sharp from 'sharp';
+
+import type { Screenshot } from './types';
 
 async function takeScreenshot(url: string, element: string): Promise<Screenshot> {
   const browser = await chromium.launch();

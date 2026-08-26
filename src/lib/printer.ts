@@ -1,16 +1,18 @@
-import net from "node:net";
-import ReceiptPrinterEncoder from "@point-of-sale/receipt-printer-encoder";
-import pino from "pino";
-import env from "@/env";
+import net from 'node:net';
+
+import ReceiptPrinterEncoder from '@point-of-sale/receipt-printer-encoder';
+import pino from 'pino';
+
+import env from '@/env';
 
 // Default port for thermal printer communication (ESC/POS protocol)
 const PORT: number = 9100;
 // IP address of the thermal printer, with fallback to default
-const HOST: string = env.PRINTER_HOST ?? "10.0.1.128";
+const HOST: string = env.PRINTER_HOST ?? '10.0.1.128';
 
 // When true, skip the network entirely and render a readable preview of the
 // ESC/POS payload to the terminal instead.
-export const offline: boolean = env.PRINTER_OFFLINE === "true";
+export const offline: boolean = env.PRINTER_OFFLINE === 'true';
 
 const printerLogger = pino({ level: env.LOG_LEVEL });
 type DebugLogger = { info: (details: Record<string, unknown>, message: string) => void };
@@ -19,17 +21,17 @@ function debugLog(logger: DebugLogger, event: string, details: Record<string, un
   logger.info(details, `[dota-match-debug] ${event}`);
 }
 
-debugLog(printerLogger, "printer_mode", { offline });
+debugLog(printerLogger, 'printer_mode', { offline });
 
 // Development logging utility - only logs when not in production
 function log(...args: unknown[]): void {
-  if (env.NODE_ENV === "production") return;
-  console.log("[🧾 THERMAL]", ...args);
+  if (env.NODE_ENV === 'production') return;
+  console.log('[🧾 THERMAL]', ...args);
 }
 
 // Factory function to create a new socket instance
 const printerClientSingleton = (): net.Socket => {
-  log("Creating new socket...");
+  log('Creating new socket...');
   return new net.Socket();
 };
 
@@ -39,33 +41,33 @@ globalThis.printerClientGlobal = client;
 
 // Establish initial connection to printer on first module load
 if (!offline && !globalThis.printerConnected) {
-  log("Connecting to printer for the first time");
-  debugLog(printerLogger, "printer_connecting");
+  log('Connecting to printer for the first time');
+  debugLog(printerLogger, 'printer_connecting');
   client.connect(PORT, HOST, () => {
     globalThis.printerConnected = true;
-    log("Connected to printer");
-    debugLog(printerLogger, "printer_connected");
+    log('Connected to printer');
+    debugLog(printerLogger, 'printer_connected');
   });
 } else if (offline) {
-  log("Offline mode — skipping printer connection");
-  debugLog(printerLogger, "printer_connection_skipped", { offline: true });
+  log('Offline mode — skipping printer connection');
+  debugLog(printerLogger, 'printer_connection_skipped', { offline: true });
 }
 
 // Handle incoming data from printer (status responses)
-client.on("data", (data): void => {
-  log("Received:", data.toString("hex"));
+client.on('data', (data): void => {
+  log('Received:', data.toString('hex'));
 });
 
 // Handle connection errors
-client.on("error", (err): void => {
-  log("Error connecting to printer:", err);
-  debugLog(printerLogger, "printer_error", { error: err.message });
+client.on('error', (err): void => {
+  log('Error connecting to printer:', err);
+  debugLog(printerLogger, 'printer_error', { error: err.message });
 });
 
 // Handle disconnection
-client.on("close", (): void => {
-  log("Disconnected from printer");
-  debugLog(printerLogger, "printer_closed");
+client.on('close', (): void => {
+  log('Disconnected from printer');
+  debugLog(printerLogger, 'printer_closed');
 });
 
 // Extend global type definitions for printer-specific properties
@@ -85,7 +87,7 @@ export const encoder: ReceiptPrinterEncoder = new ReceiptPrinterEncoder({
 // renders a readable preview when offline.
 export function print(e: ReceiptPrinterEncoder, logger: DebugLogger = printerLogger): void {
   const data = e.encode();
-  debugLog(logger, "printer_write", {
+  debugLog(logger, 'printer_write', {
     offline,
     encoded_bytes: data.byteLength,
     connected: globalThis.printerConnected === true,
@@ -95,11 +97,11 @@ export function print(e: ReceiptPrinterEncoder, logger: DebugLogger = printerLog
   });
   if (offline) {
     renderPreview(data);
-    debugLog(logger, "printer_write_result", { offline: true, result: null });
+    debugLog(logger, 'printer_write_result', { offline: true, result: null });
     return;
   }
   const result = client.write(data);
-  debugLog(logger, "printer_write_result", { offline: false, result });
+  debugLog(logger, 'printer_write_result', { offline: false, result });
 }
 
 // ESC/POS commands emitted by this app whose payload is one parameter byte.
@@ -168,6 +170,6 @@ function renderPreview(buf: Uint8Array): void {
     i += 1;
   }
 
-  const text = new TextDecoder("utf-8").decode(new Uint8Array(cleaned));
-  console.log("[🧾 THERMAL DRY-RUN]\n" + text);
+  const text = new TextDecoder('utf-8').decode(new Uint8Array(cleaned));
+  console.log('[🧾 THERMAL DRY-RUN]\n' + text);
 }
