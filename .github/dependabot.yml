@@ -17,9 +17,6 @@ updates:
           - "hono"
           - "@hono/*"
           - "@scalar/*"
-      clickhouse:
-        patterns:
-          - "@clickhouse/*"
       dev-deps:
         dependency-type: "development"
         patterns:

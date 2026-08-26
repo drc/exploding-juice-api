@@ -3,14 +3,13 @@ import clipsRoutes from "@/routes/clips/clips.index";
 import dotaRoutes from "@/routes/dota/dota.index";
 import errorRoutes from "@/routes/error/error.index";
 import todoRoutes from "@/routes/todo/todo.index";
-import playersRoutes from "@/routes/players/players.index";
 import createApp, { configureOpenAPI } from "./lib/factory";
 
 const app = createApp();
 
 configureOpenAPI(app);
 
-const routes = [askRoutes, todoRoutes, errorRoutes, playersRoutes, clipsRoutes, dotaRoutes] as const;
+const routes = [askRoutes, todoRoutes, errorRoutes, clipsRoutes, dotaRoutes] as const;
 
 routes.forEach((route) => {
   app.route("/", route);

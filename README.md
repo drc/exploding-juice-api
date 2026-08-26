@@ -1,6 +1,6 @@
 # f0r†un3_c0ok1€
 
-A TypeScript HTTP API for printing fortunes, to-do items, and Dota 2 results to a network thermal printer. It also provides ClickHouse-backed player metrics and audio clip generation.
+A TypeScript HTTP API for printing fortunes, to-do items, Dota 2 results, and audio clips to a network thermal printer.
 
 ## Quick Start
 
@@ -63,8 +63,7 @@ Both endpoints accept strings from 1 to 200 characters and return `201` on succe
 
 ### Dota And Service
 
-- `GET /players/search?query=&limit=` searches Dota players through ClickHouse.
-- `GET /players/wrapped/{accountId}` returns weekly wrapped metrics from ClickHouse.
+- `POST /dota/match-result` fetches match and player details from OpenDota, including fallback player profile lookups, and prints the result.
 - `GET /health` returns `OK`.
 - `GET /doc` returns the OpenAPI 3.1 document.
 - `GET /llms.txt` returns Markdown generated from the OpenAPI document.
@@ -74,24 +73,14 @@ Both endpoints accept strings from 1 to 200 characters and return `201` on succe
 
 All environment variables are validated at startup by `src/env.ts`. Invalid values terminate the process. Use `.env.example` as the variable list.
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `LOG_LEVEL` | required | Pino log level: `fatal`, `error`, `warn`, `info`, `debug`, or `trace` |
-| `NODE_ENV` | `development` | Selects development or production logging and error details |
-| `PORT` | `3000` | HTTP server port |
-| `PRINTER_HOST` | `10.0.1.128` | Thermal printer hostname or address |
-| `PRINTER_OFFLINE` | `false` | Skip printer networking and render a terminal preview |
-| `CLICKHOUSE_URL` | `https://clickhouse.ponder.guru` | ClickHouse read endpoint |
-| `CLICKHOUSE_USER` | `default` | ClickHouse read user |
-| `CLICKHOUSE_PASSWORD` | unset | ClickHouse read password; may be a shell command |
-| `CLICKHOUSE_WRITE_URL` | unset | Optional ClickHouse write endpoint |
-| `CLICKHOUSE_WRITE_USER` | unset | Optional ClickHouse write user |
-| `CLICKHOUSE_WRITE_PASSWORD` | unset | Optional ClickHouse write password; may be a shell command |
-| `CLICKHOUSE_WRITE_DATABASE` | `default` | ClickHouse write database |
-| `CLICKHOUSE_WRITE_TABLE` | `wrapped_data` | ClickHouse write table |
-| `ENABLE_PERSISTENCE` | `false` | Enable fire-and-forget ClickHouse writes |
-| `CACHE_TTL_MINUTES` | `1440` | In-memory cache lifetime |
-| `CLIP_API_SECRET` | unset | Secret used to authorize clip requests |
+| Variable          | Default       | Purpose                                                               |
+| ----------------- | ------------- | --------------------------------------------------------------------- |
+| `LOG_LEVEL`       | required      | Pino log level: `fatal`, `error`, `warn`, `info`, `debug`, or `trace` |
+| `NODE_ENV`        | `development` | Selects development or production logging and error details           |
+| `PORT`            | `3000`        | HTTP server port                                                      |
+| `PRINTER_HOST`    | `10.0.1.128`  | Thermal printer hostname or address                                   |
+| `PRINTER_OFFLINE` | `false`       | Skip printer networking and render a terminal preview                 |
+| `CLIP_API_SECRET` | unset         | Secret used to authorize clip requests                                |
 
 The printer uses TCP port `9100` and connects when the printer module loads unless offline mode is enabled. The application uses Playwright for screenshots, `sharp` for image conversion, and `@napi-rs/canvas` for printer image data.
 
