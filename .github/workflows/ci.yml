@@ -12,11 +12,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: package.json
-          cache: pnpm
+      - run: node --version && pnpm --version
       - run: pnpm install
       - run: pnpm lint
 
@@ -24,10 +20,6 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: package.json
-          cache: pnpm
+      - run: node --version && pnpm --version
       - run: pnpm install
       - run: pnpm build
