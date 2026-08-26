@@ -6,10 +6,16 @@ import type { OpenDotaPlayer } from "@/types/opendota";
 import type { PrintMatchResultRoute } from "./dota.routes";
 import { formatDuration } from "./dota.schema";
 
+type DebugLogger = { info: (details: Record<string, unknown>, message: string) => void };
+
 const COLUMNS = 48;
 const DIVIDER = "=".repeat(COLUMNS);
 const THIN_DIVIDER = "-".repeat(COLUMNS);
 const activeMatchPrintJobs = new Set<string>();
+
+function debugLog(logger: DebugLogger, event: string, details: Record<string, unknown> = {}): void {
+  logger.info(details, `[dota-match-debug] ${event}`);
+}
 
 function padRight(s: string, n: number): string {
   if (s.length >= n) return s.slice(0, n);
@@ -34,16 +40,21 @@ async function mapPlayer(p: OpenDotaPlayer) {
   };
 }
 
-async function processMatchResult(match_id: string): Promise<void> {
+async function processMatchResult(match_id: string, logger: DebugLogger): Promise<void> {
+  debugLog(logger, "job_started", { match_id });
   let match;
   try {
-    match = await fetchMatch(match_id);
-  } catch {
-    console.error("OpenDota match fetch failed:", match_id);
+    match = await fetchMatch(match_id, logger);
+  } catch (err) {
+    debugLog(logger, "job_fetch_failed", {
+      match_id,
+      error: err instanceof Error ? err.message : String(err),
+    });
     return;
   }
   if (match === null) {
-    console.warn("Match was not ready after polling:", match_id);
+    debugLog(logger, "match_not_ready_after_polling", { match_id });
+    debugLog(logger, "job_completed", { match_id, outcome: "not_ready" });
     return;
   }
 
@@ -96,29 +107,51 @@ async function processMatchResult(match_id: string): Promise<void> {
 
   e = e.line(THIN_DIVIDER).align("center").line("GG WP").line(DIVIDER).newline(3).cut();
 
+  debugLog(logger, "receipt_ready", {
+    match_id,
+    date,
+    duration,
+    winner,
+    score: { winner: winnerScore, loser: loserScore },
+    radiant_team,
+    dire_team,
+  });
   try {
-    print(e);
+    print(e, logger);
+    debugLog(logger, "job_completed", { match_id });
   } catch (err) {
-    console.error("printer write failed:", err);
+    debugLog(logger, "job_print_failed", {
+      match_id,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }
 
-function enqueueMatchPrint(match_id: string): void {
-  if (activeMatchPrintJobs.has(match_id)) return;
+function enqueueMatchPrint(match_id: string, logger: DebugLogger): void {
+  if (activeMatchPrintJobs.has(match_id)) {
+    debugLog(logger, "job_duplicate_suppressed", { match_id });
+    return;
+  }
   activeMatchPrintJobs.add(match_id);
+  debugLog(logger, "job_queued", { match_id });
 
-  void processMatchResult(match_id)
+  void processMatchResult(match_id, logger)
     .catch((err) => {
-      console.error("Match print job failed:", match_id, err);
+      debugLog(logger, "job_failed", {
+        match_id,
+        error: err instanceof Error ? err.message : String(err),
+      });
     })
     .finally(() => {
       activeMatchPrintJobs.delete(match_id);
+      debugLog(logger, "job_queue_released", { match_id });
     });
 }
 
 export const printMatchResult: AppRouteHander<PrintMatchResultRoute> = (c) => {
   const { match_id } = c.req.valid("json");
-  enqueueMatchPrint(match_id);
+  debugLog(c.var.logger, "request_accepted", { match_id });
+  enqueueMatchPrint(match_id, c.var.logger);
 
   return c.json({ status: "accepted", match_id }, StatusCodes.ACCEPTED);
 };
