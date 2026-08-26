@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/dota-match-result]
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 22.13.0
       - uses: pnpm/action-setup@v6
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm lint
 
   build:
@@ -27,5 +27,5 @@ jobs:
         with:
           node-version: 22.13.0
       - uses: pnpm/action-setup@v6
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
