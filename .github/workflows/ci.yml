@@ -18,6 +18,7 @@ jobs:
       - uses: pnpm/action-setup@v6
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm format:check
 
   build:
     runs-on: [self-hosted, Linux, X64]
