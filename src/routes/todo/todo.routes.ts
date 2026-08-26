@@ -34,7 +34,8 @@ export const printTodo = createRoute({
       description: `Returns a ${StatusCodes.CREATED} status code if the to-do item was printed successfully.`,
     },
   },
-  summary: 'Print a to-do item to the connected printer',
+  summary: 'Print Todo',
+  description: 'Print a to-do item to the connected printer',
   tags: ['ToDo'],
 });
 
