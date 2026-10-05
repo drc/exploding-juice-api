@@ -16,7 +16,7 @@
   "dependencies": {
     "@hono/node-server": "^2.1.1",
     "@hono/zod-openapi": "^1.6.3",
-    "@napi-rs/canvas": "^1.0.9",
+    "@napi-rs/canvas": "^1.0.10",
     "@point-of-sale/receipt-printer-encoder": "^4.0.1",
     "@scalar/hono-api-reference": "^0.12.2",
     "@scalar/openapi-to-markdown": "^1.0.1",
